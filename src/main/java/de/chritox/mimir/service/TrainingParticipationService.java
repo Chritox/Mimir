@@ -41,6 +41,9 @@ public class TrainingParticipationService {
 
     @Transactional
     public TrainingParticipation saveParticipation(TrainingParticipation participation) {
+        if (participation == null) {
+            throw new IllegalArgumentException("TrainingParticipation cannot be null");
+        }
         // Calculate next due date based on completion date and training interval
         if (participation.getCompletionDate() != null && 
             participation.getTraining() != null && 
