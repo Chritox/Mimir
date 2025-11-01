@@ -1,0 +1,50 @@
+name: Build Spring Boot JAR and Native Executable
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-jar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build JAR with Maven
+        run: mvn clean package
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v3
+        with:
+          name: springboot-jar
+          path: target/*.jar
+
+  build-native-win:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'graalvm'
+
+      - name: Build Native Executable
+        run: mvn -Pnative native:compile
+
+      - name: Upload Native EXE
+        uses: actions/upload-artifact@v3
+        with:
+          name: springboot-exe-win
+          path: target/*.exe
