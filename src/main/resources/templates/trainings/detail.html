@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-mortarboard"></i> Schulungsdetails</h1>
+                <div>
+                    <a th:href="@{/trainings/edit/{id}(id=${training.id})}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Bearbeiten
+                    </a>
+                    <a th:href="@{/trainings}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Zurück
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>Schulungsinformationen</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 200px;">ID:</th>
+                            <td th:text="${training.id}">1</td>
+                        </tr>
+                        <tr>
+                            <th>Titel:</th>
+                            <td th:text="${training.title}">Erste Hilfe</td>
+                        </tr>
+                        <tr>
+                            <th>Beschreibung:</th>
+                            <td th:text="${training.description != null ? training.description : '-'}">Grundlagen der Ersten Hilfe</td>
+                        </tr>
+                        <tr>
+                            <th>Wiederholungsintervall:</th>
+                            <td>
+                                <span th:if="${training.interval != null}" th:text="${training.interval + ' Monate'}">12 Monate</span>
+                                <span th:unless="${training.interval != null}" class="text-muted">Nicht definiert</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

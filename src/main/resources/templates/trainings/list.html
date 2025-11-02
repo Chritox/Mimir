@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-mortarboard"></i> Schulungen</h1>
+                <a th:href="@{/trainings/new}" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Neue Schulung
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titel</th>
+                                    <th>Beschreibung</th>
+                                    <th>Intervall (Monate)</th>
+                                    <th class="table-actions">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${trainings.isEmpty()}">
+                                    <td colspan="5" class="text-center text-muted">
+                                        Keine Schulungen vorhanden
+                                    </td>
+                                </tr>
+                                <tr th:each="training : ${trainings}">
+                                    <td th:text="${training.id}">1</td>
+                                    <td th:text="${training.title}">Erste Hilfe</td>
+                                    <td th:text="${training.description != null ? (training.description.length() > 50 ? training.description.substring(0, 50) + '...' : training.description) : ''}">Beschreibung</td>
+                                    <td th:text="${training.interval}">12</td>
+                                    <td class="table-actions">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a th:href="@{/trainings/{id}(id=${training.id})}" class="btn btn-info" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a th:href="@{/trainings/edit/{id}(id=${training.id})}" class="btn btn-warning" title="Bearbeiten">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a th:href="@{/trainings/delete/{id}(id=${training.id})}" 
+                                               class="btn btn-danger" 
+                                               title="Löschen"
+                                               onclick="return confirm('Möchten Sie diese Schulung wirklich löschen?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

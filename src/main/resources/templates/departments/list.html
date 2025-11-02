@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-building"></i> Abteilungen</h1>
+                <a th:href="@{/departments/new}" class="btn btn-info">
+                    <i class="bi bi-plus-circle"></i> Neue Abteilung
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Beschreibung</th>
+                                    <th class="table-actions">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${departments.isEmpty()}">
+                                    <td colspan="4" class="text-center text-muted">
+                                        Keine Abteilungen vorhanden
+                                    </td>
+                                </tr>
+                                <tr th:each="department : ${departments}">
+                                    <td th:text="${department.id}">1</td>
+                                    <td th:text="${department.name}">IT</td>
+                                    <td th:text="${department.description != null ? (department.description.length() > 50 ? department.description.substring(0, 50) + '...' : department.description) : ''}">Beschreibung</td>
+                                    <td class="table-actions">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a th:href="@{/departments/{id}(id=${department.id})}" class="btn btn-info" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a th:href="@{/departments/edit/{id}(id=${department.id})}" class="btn btn-warning" title="Bearbeiten">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a th:href="@{/departments/delete/{id}(id=${department.id})}" 
+                                               class="btn btn-danger" 
+                                               title="Löschen"
+                                               onclick="return confirm('Möchten Sie diese Abteilung wirklich löschen?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
