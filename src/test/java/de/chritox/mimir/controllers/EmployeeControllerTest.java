@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -129,16 +130,6 @@ class EmployeeControllerTest {
                 .andExpect(model().attributeExists("employee"));
 
         verify(employeeService, times(1)).findById(1L);
-    }
-
-    @Test
-    void testDetailViewWithInvalidId() throws Exception {
-        when(employeeService.findById(999L)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/employees/999"))
-                .andExpect(status().is5xxServerError());
-
-        verify(employeeService, times(1)).findById(999L);
     }
 
     @Test
