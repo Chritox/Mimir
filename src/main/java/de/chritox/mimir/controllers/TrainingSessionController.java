@@ -25,7 +25,7 @@ public class TrainingSessionController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("session", new TrainingSession());
+        model.addAttribute("trainingSession", new TrainingSession());
         model.addAttribute("trainings", trainingService.findAll());
         model.addAttribute("employees", employeeService.findAll());
         return "sessions/form";
@@ -33,17 +33,17 @@ public class TrainingSessionController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        TrainingSession session = sessionService.findById(id)
+        TrainingSession trainingSession = sessionService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid session Id: " + id));
-        model.addAttribute("session", session);
+        model.addAttribute("trainingSession", trainingSession);
         model.addAttribute("trainings", trainingService.findAll());
         model.addAttribute("employees", employeeService.findAll());
         return "sessions/form";
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute TrainingSession session) {
-        sessionService.save(session);
+    public String save(@ModelAttribute("trainingSession") TrainingSession trainingSession) {
+        sessionService.save(trainingSession);
         return "redirect:/sessions";
     }
 
@@ -55,9 +55,9 @@ public class TrainingSessionController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        TrainingSession session = sessionService.findById(id)
+        TrainingSession trainingSession = sessionService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid session Id: " + id));
-        model.addAttribute("session", session);
+        model.addAttribute("trainingSession", trainingSession);
         return "sessions/detail";
     }
 

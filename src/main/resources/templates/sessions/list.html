@@ -37,20 +37,20 @@
                                         Keine Schulungstermine vorhanden
                                     </td>
                                 </tr>
-                                <tr th:each="session : ${sessions}">
-                                    <td th:text="${session.id}">1</td>
-                                    <td th:text="${session.training != null ? session.training.title : 'N/A'}">Erste Hilfe</td>
-                                    <td th:text="${#temporals.format(session.date, 'dd.MM.yyyy')}">01.01.2025</td>
-                                    <td th:text="${session.participants != null ? session.participants.size() : 0}">0</td>
+                                <tr th:each="trainingSession : ${sessions}">
+                                    <td th:text="${trainingSession.id}">1</td>
+                                    <td th:text="${trainingSession.training != null ? trainingSession.training.title : 'N/A'}">Erste Hilfe</td>
+                                    <td th:text="${#temporals.format(trainingSession.date, 'dd.MM.yyyy')}">01.01.2025</td>
+                                    <td th:text="${trainingSession.participants != null ? trainingSession.participants.size() : 0}">0</td>
                                     <td class="table-actions">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a th:href="@{/sessions/{id}(id=${session.id})}" class="btn btn-info" title="Details">
+                                            <a th:href="@{/sessions/{id}(id=${trainingSession.id})}" class="btn btn-info" title="Details">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a th:href="@{/sessions/edit/{id}(id=${session.id})}" class="btn btn-warning" title="Bearbeiten">
+                                            <a th:href="@{/sessions/edit/{id}(id=${trainingSession.id})}" class="btn btn-warning" title="Bearbeiten">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a th:href="@{/sessions/delete/{id}(id=${session.id})}" 
+                                            <a th:href="@{/sessions/delete/{id}(id=${trainingSession.id})}" 
                                                class="btn btn-danger" 
                                                title="Löschen"
                                                onclick="return confirm('Möchten Sie diesen Termin wirklich löschen?')">

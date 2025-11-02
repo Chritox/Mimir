@@ -31,27 +31,27 @@
                                         Keine anstehenden Schulungstermine vorhanden
                                     </td>
                                 </tr>
-                                <tr th:each="session : ${sessions}">
+                                <tr th:each="trainingSession : ${sessions}">
                                     <td>
-                                        <strong th:text="${#temporals.format(session.date, 'dd.MM.yyyy')}">01.01.2025</strong>
+                                        <strong th:text="${#temporals.format(trainingSession.date, 'dd.MM.yyyy')}">01.01.2025</strong>
                                         <br>
-                                        <small class="text-muted" th:text="${#temporals.format(session.date, 'EEEE', 'de')}">Montag</small>
+                                        <small class="text-muted" th:text="${#temporals.dayOfWeekName(trainingSession.date)}">Montag</small>
                                     </td>
                                     <td>
-                                        <a th:href="@{/sessions/{id}(id=${session.id})}" 
-                                           th:text="${session.training != null ? session.training.title : 'N/A'}">Erste Hilfe</a>
+                                        <a th:href="@{/sessions/{id}(id=${trainingSession.id})}" 
+                                           th:text="${trainingSession.training != null ? trainingSession.training.title : 'N/A'}">Erste Hilfe</a>
                                     </td>
                                     <td>
-                                        <span class="badge bg-primary" th:text="${session.participants != null ? session.participants.size() + ' Teilnehmer' : '0 Teilnehmer'}">
+                                        <span class="badge bg-primary" th:text="${trainingSession.participants != null ? trainingSession.participants.size() + ' Teilnehmer' : '0 Teilnehmer'}">
                                             0 Teilnehmer
                                         </span>
                                     </td>
                                     <td class="table-actions">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a th:href="@{/sessions/{id}(id=${session.id})}" class="btn btn-info" title="Details">
+                                            <a th:href="@{/sessions/{id}(id=${trainingSession.id})}" class="btn btn-info" title="Details">
                                                 <i class="bi bi-eye"></i>
                                             </a>
-                                            <a th:href="@{/sessions/edit/{id}(id=${session.id})}" class="btn btn-warning" title="Bearbeiten">
+                                            <a th:href="@{/sessions/edit/{id}(id=${trainingSession.id})}" class="btn btn-warning" title="Bearbeiten">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
                                         </div>

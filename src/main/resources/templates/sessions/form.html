@@ -10,12 +10,12 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            <h3 th:text="${session.id != null ? 'Schulungstermin bearbeiten' : 'Neuer Schulungstermin'}">
+                            <h3 th:text="${trainingSession.id != null ? 'Schulungstermin bearbeiten' : 'Neuer Schulungstermin'}">
                                 Schulungstermin
                             </h3>
                         </div>
                         <div class="card-body">
-                            <form th:action="@{/sessions/save}" th:object="${session}" method="post">
+                            <form th:action="@{/sessions/save}" th:object="${trainingSession}" method="post">
                                 <input type="hidden" th:field="*{id}">
                                 
                                 <div class="mb-3">
