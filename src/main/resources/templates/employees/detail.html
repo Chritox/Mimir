@@ -84,12 +84,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="session : ${employee.attendedSessions}">
+                                        <tr th:each="attendedSession : ${employee.attendedSessions}">
                                             <td>
-                                                <a th:href="@{/sessions/{id}(id=${session.id})}" 
-                                                   th:text="${session.training != null ? session.training.title : 'N/A'}">Schulung</a>
+                                                <a th:href="@{/sessions/{id}(id=${attendedSession.id})}" 
+                                                   th:text="${attendedSession.training != null ? attendedSession.training.title : 'N/A'}">Schulung</a>
                                             </td>
-                                            <td th:text="${#temporals.format(session.date, 'dd.MM.yyyy')}">01.01.2025</td>
+                                            <td th:text="${#temporals.format(attendedSession.date, 'dd.MM.yyyy')}">01.01.2025</td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -6,8 +6,18 @@
 
     <div class="content">
         <div class="container">
-            <h1><i class="bi bi-clipboard-data"></i> Schulungsbedarfsanalyse</h1>
-            <p class="lead">Übersicht über Mitarbeiter, die Schulungen benötigen</p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h1><i class="bi bi-clipboard-data"></i> Schulungsbedarfsanalyse</h1>
+                    <p class="lead mb-0">Übersicht über Mitarbeiter, die Schulungen benötigen</p>
+                </div>
+                <div>
+                    <a th:href="@{/reports/training-needs/export(targetDate=${targetDate})}" 
+                       class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel"></i> Excel Export (Alle Abteilungen)
+                    </a>
+                </div>
+            </div>
 
             <div class="card mb-4">
                 <div class="card-header">
@@ -53,7 +63,7 @@
                     <div class="card-body">
                         <div th:if="${employees.isEmpty()}" class="text-center text-muted py-4">
                             <i class="bi bi-check-circle display-1"></i>
-                            <p class="mt-3">Alle Mitarbeiter sind up-to-date mit ihren Schulungen!</p>
+                            <p class="mt-3">Keine Mitarbeiter in dieser Abteilung!</p>
                         </div>
                         
                         <div th:if="${!employees.isEmpty()}" class="table-responsive">
@@ -62,7 +72,8 @@
                                     <tr>
                                         <th>Mitarbeiter</th>
                                         <th>Abteilung</th>
-                                        <th>Pflichtschulungen</th>
+                                        <th>Fällige Schulungen</th>
+                                        <th>Details</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -73,21 +84,31 @@
                                         </td>
                                         <td th:text="${employee.department != null ? employee.department.name : '-'}">Abteilung</td>
                                         <td>
-                                            <span th:if="${employee.mandatoryTrainings != null and !employee.mandatoryTrainings.isEmpty()}">
-                                                <span th:each="training, iterStat : ${employee.mandatoryTrainings}">
-                                                    <span th:text="${training.title}">Schulung</span>
-                                                    <span th:if="${!iterStat.last}">, </span>
-                                                </span>
-                                            </span>
-                                            <span th:unless="${employee.mandatoryTrainings != null and !employee.mandatoryTrainings.isEmpty()}" class="text-muted">
-                                                Keine Pflichtschulungen
+                                            <div th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}">
+                                                <div th:each="entry : ${employeeDueTrainings.get(employee.id)}" class="mb-1">
+                                                    <strong th:text="${entry.key.title}">Schulung</strong>
+                                                    <span class="text-muted small" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
+                                                        (fällig: 01.01.2025)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" class="text-muted">
+                                                Keine fälligen Schulungen
                                             </span>
                                         </td>
                                         <td>
-                                            <span th:if="${employee.mandatoryTrainings != null and !employee.mandatoryTrainings.isEmpty()}" class="badge bg-warning">
+                                            <span th:if="${employeeDueTrainings.get(employee.id) != null}" 
+                                                  th:text="${employeeDueTrainings.get(employee.id).size()} + ' Schulung(en)'">
+                                                0 Schulungen
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}" 
+                                                  class="badge bg-warning">
                                                 <i class="bi bi-exclamation-triangle"></i> Schulungsbedarf
                                             </span>
-                                            <span th:unless="${employee.mandatoryTrainings != null and !employee.mandatoryTrainings.isEmpty()}" class="badge bg-success">
+                                            <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" 
+                                                  class="badge bg-success">
                                                 <i class="bi bi-check-circle"></i> Aktuell
                                             </span>
                                         </td>
