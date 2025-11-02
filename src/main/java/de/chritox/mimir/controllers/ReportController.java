@@ -130,17 +130,31 @@ public class ReportController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid department Id: " + departmentId));
         List<Employee> employees = employeeService.findByDepartmentId(departmentId);
         
-        // Calculate due trainings for each employee
+        // Calculate due trainings for each employee and count statistics
         Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+        int employeesWithNeeds = 0;
+        int overdueCount = 0;
+        
         for (Employee employee : employees) {
             Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
             employeeDueTrainings.put(employee.getId(), dueTrainings);
+            
+            if (!dueTrainings.isEmpty()) {
+                employeesWithNeeds++;
+                for (LocalDate dueDate : dueTrainings.values()) {
+                    if (dueDate.isBefore(LocalDate.now())) {
+                        overdueCount++;
+                    }
+                }
+            }
         }
         
         model.addAttribute("department", department);
         model.addAttribute("employees", employees);
         model.addAttribute("employeeDueTrainings", employeeDueTrainings);
         model.addAttribute("targetDate", date);
+        model.addAttribute("employeesWithNeeds", employeesWithNeeds);
+        model.addAttribute("overdueCount", overdueCount);
         
         return "reports/print-department";
     }

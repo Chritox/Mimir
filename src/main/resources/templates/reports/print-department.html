@@ -159,11 +159,11 @@
             <div>Mitarbeiter gesamt</div>
         </div>
         <div class="summary-box" style="background-color: #fff3cd;">
-            <div class="summary-number" th:text="${employeeDueTrainings.values().stream().filter(m -> !m.isEmpty()).count()}">0</div>
+            <div class="summary-number" th:text="${employeesWithNeeds}">0</div>
             <div>Mitarbeiter mit Schulungsbedarf</div>
         </div>
         <div class="summary-box" style="background-color: #f8d7da;">
-            <div class="summary-number" th:text="${employeeDueTrainings.values().stream().flatMap(m -> m.values().stream()).filter(d -> d.isBefore(#temporals.createToday())).count()}">0</div>
+            <div class="summary-number" th:text="${overdueCount}">0</div>
             <div>Überfällige Schulungen</div>
         </div>
     </div>
