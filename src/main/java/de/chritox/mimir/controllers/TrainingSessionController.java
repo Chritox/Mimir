@@ -34,7 +34,7 @@ public class TrainingSessionController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         TrainingSession session = sessionService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid session Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid session Id: " + id));
         model.addAttribute("session", session);
         model.addAttribute("trainings", trainingService.findAll());
         model.addAttribute("employees", employeeService.findAll());
@@ -56,7 +56,7 @@ public class TrainingSessionController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         TrainingSession session = sessionService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid session Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid session Id: " + id));
         model.addAttribute("session", session);
         return "sessions/detail";
     }

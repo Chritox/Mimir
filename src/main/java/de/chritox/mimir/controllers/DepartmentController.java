@@ -30,7 +30,7 @@ public class DepartmentController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Department department = departmentService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid department Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid department Id: " + id));
         model.addAttribute("department", department);
         return "departments/form";
     }
@@ -50,7 +50,7 @@ public class DepartmentController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Department department = departmentService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid department Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid department Id: " + id));
         model.addAttribute("department", department);
         model.addAttribute("employees", employeeService.findByDepartmentId(id));
         return "departments/detail";

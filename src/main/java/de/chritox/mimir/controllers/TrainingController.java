@@ -28,7 +28,7 @@ public class TrainingController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Training training = trainingService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid training Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid training Id: " + id));
         model.addAttribute("training", training);
         return "trainings/form";
     }
@@ -48,7 +48,7 @@ public class TrainingController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Training training = trainingService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid training Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid training Id: " + id));
         model.addAttribute("training", training);
         return "trainings/detail";
     }

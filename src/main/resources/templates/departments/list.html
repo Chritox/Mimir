@@ -34,7 +34,7 @@
                                 <tr th:each="department : ${departments}">
                                     <td th:text="${department.id}">1</td>
                                     <td th:text="${department.name}">IT</td>
-                                    <td th:text="${department.description != null ? (department.description.length() > 50 ? department.description.substring(0, 50) + '...' : department.description) : ''}">Beschreibung</td>
+                                    <td th:text="${#strings.abbreviate(department.description, 50)}">Beschreibung</td>
                                     <td class="table-actions">
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a th:href="@{/departments/{id}(id=${department.id})}" class="btn btn-info" title="Details">

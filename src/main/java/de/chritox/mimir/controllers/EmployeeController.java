@@ -34,7 +34,7 @@ public class EmployeeController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Employee employee = employeeService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid employee Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid employee Id: " + id));
         model.addAttribute("employee", employee);
         model.addAttribute("departments", departmentService.findAll());
         model.addAttribute("trainings", trainingService.findAll());
@@ -56,7 +56,7 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Employee employee = employeeService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid employee Id:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid employee Id: " + id));
         model.addAttribute("employee", employee);
         return "employees/detail";
     }

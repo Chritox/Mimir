@@ -35,7 +35,7 @@
                                 <tr th:each="training : ${trainings}">
                                     <td th:text="${training.id}">1</td>
                                     <td th:text="${training.title}">Erste Hilfe</td>
-                                    <td th:text="${training.description != null ? (training.description.length() > 50 ? training.description.substring(0, 50) + '...' : training.description) : ''}">Beschreibung</td>
+                                    <td th:text="${#strings.abbreviate(training.description, 50)}">Beschreibung</td>
                                     <td th:text="${training.interval}">12</td>
                                     <td class="table-actions">
                                         <div class="btn-group btn-group-sm" role="group">
