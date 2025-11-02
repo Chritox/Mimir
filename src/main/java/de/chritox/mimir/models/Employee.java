@@ -28,4 +28,8 @@ public class Employee {
             inverseJoinColumns = @JoinColumn(name = "training_id")
     )
     private Set<Training> mandatoryTrainings;
+
+    @ManyToMany(mappedBy = "participants")
+    private Set<TrainingSession> attendedSessions = new HashSet<>();
+
 }
