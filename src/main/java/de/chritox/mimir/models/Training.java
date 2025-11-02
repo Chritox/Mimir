@@ -11,7 +11,7 @@ public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private Integer interval;
     private String title;
     private String description;
 }
