@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head}"></head>
+<head th:replace="~{fragments/header :: header}"></head>
 <body>
-    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
 
     <div class="content">
         <div class="container">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
-    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
 </body>
 </html>

@@ -172,8 +172,8 @@
         <thead>
             <tr>
                 <th>Mitarbeiter</th>
-                <th>Schulung</th>
-                <th>Fällig am</th>
+                <th>Fällige Schulungen</th>
+                <th>Anzahl</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -181,26 +181,35 @@
             <tr th:if="${employees.isEmpty()}">
                 <td colspan="4" style="text-align: center; color: #666;">Keine Mitarbeiter in dieser Abteilung</td>
             </tr>
-            <th:block th:each="employee : ${employees}">
-                <th:block th:if="${employeeDueTrainings.get(employee.id).isEmpty()}">
-                    <tr>
-                        <td th:text="${employee.name}">Mitarbeiter</td>
-                        <td colspan="2">Keine fälligen Schulungen</td>
-                        <td><span class="status-current">Aktuell</span></td>
-                    </tr>
-                </th:block>
-                <th:block th:if="${!employeeDueTrainings.get(employee.id).isEmpty()}">
-                    <tr th:each="entry : ${employeeDueTrainings.get(employee.id)}">
-                        <td th:text="${employee.name}">Mitarbeiter</td>
-                        <td th:text="${entry.key.title}">Schulung</td>
-                        <td th:text="${#temporals.format(entry.value, 'dd.MM.yyyy')}">01.01.2025</td>
-                        <td>
-                            <span th:if="${entry.value.isBefore(#temporals.createToday())}" class="status-overdue">Überfällig</span>
-                            <span th:unless="${entry.value.isBefore(#temporals.createToday())}" class="status-due">Fällig</span>
-                        </td>
-                    </tr>
-                </th:block>
-            </th:block>
+            <tr th:each="employee : ${employees}">
+                <td th:text="${employee.name}">Mitarbeiter</td>
+                <td>
+                    <div th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}">
+                        <div th:each="entry : ${employeeDueTrainings.get(employee.id)}" style="margin-bottom: 5px;">
+                            <strong th:text="${entry.key.title}">Schulung</strong>
+                            <span style="color: #666; font-size: 0.9em;" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
+                                (fällig: 01.01.2025)
+                            </span>
+                            <span th:if="${entry.value.isBefore(#temporals.createToday())}" class="status-overdue" style="margin-left: 5px; font-size: 0.8em;">Überfällig</span>
+                            <span th:unless="${entry.value.isBefore(#temporals.createToday())}" class="status-due" style="margin-left: 5px; font-size: 0.8em;">Fällig</span>
+                        </div>
+                    </div>
+                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" style="color: #666;">
+                        Keine fälligen Schulungen
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${employeeDueTrainings.get(employee.id) != null}" 
+                          th:text="${employeeDueTrainings.get(employee.id).size()} + ' Schulung(en)'">0 Schulung(en)</span>
+                    <span th:if="${employeeDueTrainings.get(employee.id) == null}">0 Schulung(en)</span>
+                </td>
+                <td>
+                    <span th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}" 
+                          class="status-due">Schulungsbedarf</span>
+                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" 
+                          class="status-current">Aktuell</span>
+                </td>
+            </tr>
         </tbody>
     </table>
 </body>
