@@ -12,9 +12,13 @@
                     <p class="lead mb-0">Übersicht über Mitarbeiter, die Schulungen benötigen</p>
                 </div>
                 <div>
+                    <a th:href="@{/reports/training-needs/print(targetDate=${targetDate})}" 
+                       class="btn btn-primary me-2" target="_blank">
+                        <i class="bi bi-printer"></i> Druckansicht (Alle)
+                    </a>
                     <a th:href="@{/reports/training-needs/export(targetDate=${targetDate})}" 
                        class="btn btn-success">
-                        <i class="bi bi-file-earmark-excel"></i> Excel Export (Alle Abteilungen)
+                        <i class="bi bi-file-earmark-excel"></i> Excel Export
                     </a>
                 </div>
             </div>
@@ -49,9 +53,15 @@
                 </div>
             </div>
 
-            <div th:if="${selectedDepartment != null}" class="alert alert-info">
-                <strong>Abteilung:</strong> <span th:text="${selectedDepartment.name}">IT</span>
-                <span th:if="${selectedDepartment.description != null}" th:text="' - ' + ${selectedDepartment.description}"></span>
+            <div th:if="${selectedDepartment != null}" class="alert alert-info d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Abteilung:</strong> <span th:text="${selectedDepartment.name}">IT</span>
+                    <span th:if="${selectedDepartment.description != null}" th:text="' - ' + ${selectedDepartment.description}"></span>
+                </div>
+                <a th:href="@{/reports/training-needs/print-department(departmentId=${selectedDepartment.id},targetDate=${targetDate})}" 
+                   class="btn btn-sm btn-primary" target="_blank">
+                    <i class="bi bi-printer"></i> Druckansicht
+                </a>
             </div>
 
             <div th:if="${employees != null}">

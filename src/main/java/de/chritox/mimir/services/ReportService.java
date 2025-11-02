@@ -85,8 +85,39 @@ public class ReportService {
                                       CellStyle headerStyle, CellStyle dateStyle) {
         Sheet sheet = workbook.createSheet(sanitizeSheetName(department.getName()));
         
+        // Title and summary section
+        CellStyle titleStyle = createTitleStyle(workbook);
+        CellStyle normalStyle = createNormalStyle(workbook);
+        CellStyle overdueStyle = createOverdueStyle(workbook);
+        CellStyle dueStyle = createDueStyle(workbook);
+        CellStyle currentStyle = createCurrentStyle(workbook);
+        
+        int rowNum = 0;
+        
+        // Department title
+        Row titleRow = sheet.createRow(rowNum++);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("Schulungsbedarfsanalyse - " + department.getName());
+        titleCell.setCellStyle(titleStyle);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 4));
+        
+        // Report date
+        Row dateRow = sheet.createRow(rowNum++);
+        dateRow.createCell(0).setCellValue("Stichtag:");
+        Cell reportDateCell = dateRow.createCell(1);
+        reportDateCell.setCellValue(targetDate);
+        reportDateCell.setCellStyle(dateStyle);
+        
+        // Employee count
+        Row countRow = sheet.createRow(rowNum++);
+        countRow.createCell(0).setCellValue("Anzahl Mitarbeiter:");
+        countRow.createCell(1).setCellValue(employees.size());
+        
+        // Empty row
+        rowNum++;
+        
         // Header row
-        Row headerRow = sheet.createRow(0);
+        Row headerRow = sheet.createRow(rowNum++);
         String[] headers = {"Mitarbeiter", "Schulung", "Letzte Teilnahme", "Fällig am", "Status"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
@@ -95,56 +126,109 @@ public class ReportService {
         }
         
         // Data rows
-        int rowNum = 1;
         for (Employee employee : employees) {
             Map<Training, LocalDate> dueTrainings = getDueTrainingsForEmployee(employee, targetDate);
             
             if (dueTrainings.isEmpty()) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(employee.getName());
-                row.createCell(1).setCellValue("Keine fälligen Schulungen");
-                row.createCell(4).setCellValue("Aktuell");
+                Cell nameCell = row.createCell(0);
+                nameCell.setCellValue(employee.getName());
+                nameCell.setCellStyle(normalStyle);
+                
+                Cell trainingCell = row.createCell(1);
+                trainingCell.setCellValue("Keine fälligen Schulungen");
+                trainingCell.setCellStyle(normalStyle);
+                
+                row.createCell(2).setCellStyle(normalStyle);
+                row.createCell(3).setCellStyle(normalStyle);
+                
+                Cell statusCell = row.createCell(4);
+                statusCell.setCellValue("Aktuell");
+                statusCell.setCellStyle(currentStyle);
             } else {
                 for (Map.Entry<Training, LocalDate> entry : dueTrainings.entrySet()) {
                     Training training = entry.getKey();
                     LocalDate dueDate = entry.getValue();
                     LocalDate lastAttended = getLastAttendedDate(employee, training);
+                    boolean isOverdue = dueDate.isBefore(LocalDate.now());
                     
                     Row row = sheet.createRow(rowNum++);
-                    row.createCell(0).setCellValue(employee.getName());
-                    row.createCell(1).setCellValue(training.getTitle());
                     
+                    Cell nameCell = row.createCell(0);
+                    nameCell.setCellValue(employee.getName());
+                    nameCell.setCellStyle(normalStyle);
+                    
+                    Cell trainingCell = row.createCell(1);
+                    trainingCell.setCellValue(training.getTitle());
+                    trainingCell.setCellStyle(normalStyle);
+                    
+                    Cell lastAttendedCell = row.createCell(2);
                     if (lastAttended != null) {
-                        Cell dateCell = row.createCell(2);
-                        dateCell.setCellValue(lastAttended.toString());
-                        dateCell.setCellStyle(dateStyle);
+                        lastAttendedCell.setCellValue(lastAttended);
+                        lastAttendedCell.setCellStyle(dateStyle);
                     } else {
-                        row.createCell(2).setCellValue("Noch nie");
+                        lastAttendedCell.setCellValue("Noch nie");
+                        lastAttendedCell.setCellStyle(normalStyle);
                     }
                     
                     Cell dueDateCell = row.createCell(3);
-                    dueDateCell.setCellValue(dueDate.toString());
+                    dueDateCell.setCellValue(dueDate);
                     dueDateCell.setCellStyle(dateStyle);
                     
-                    row.createCell(4).setCellValue(dueDate.isBefore(LocalDate.now()) ? "Überfällig" : "Fällig");
+                    Cell statusCell = row.createCell(4);
+                    statusCell.setCellValue(isOverdue ? "Überfällig" : "Fällig");
+                    statusCell.setCellStyle(isOverdue ? overdueStyle : dueStyle);
                 }
             }
         }
         
-        // Auto-size columns
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        // Set column widths
+        sheet.setColumnWidth(0, 6000);  // Name
+        sheet.setColumnWidth(1, 8000);  // Training
+        sheet.setColumnWidth(2, 4000);  // Last attended
+        sheet.setColumnWidth(3, 4000);  // Due date
+        sheet.setColumnWidth(4, 3500);  // Status
+        
+        // Freeze panes (freeze header row)
+        sheet.createFreezePane(0, 5);
+    }
+    
+    private CellStyle createTitleStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 16);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.LEFT);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
     }
     
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
         style.setFont(font);
-        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.MEDIUM);
+        style.setBorderTop(BorderStyle.MEDIUM);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+    
+    private CellStyle createNormalStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
         style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setVerticalAlignment(VerticalAlignment.TOP);
+        style.setWrapText(true);
         return style;
     }
     
@@ -152,6 +236,61 @@ public class ReportService {
         CellStyle style = workbook.createCellStyle();
         CreationHelper createHelper = workbook.getCreationHelper();
         style.setDataFormat(createHelper.createDataFormat().getFormat("dd.mm.yyyy"));
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setVerticalAlignment(VerticalAlignment.TOP);
+        return style;
+    }
+    
+    private CellStyle createOverdueStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.RED.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+    
+    private CellStyle createDueStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+    
+    private CellStyle createCurrentStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         return style;
     }
     

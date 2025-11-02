@@ -81,4 +81,67 @@ public class ReportController {
                 .headers(headers)
                 .body(excelData);
     }
+    
+    @GetMapping("/training-needs/print")
+    public String printAllDepartments(
+            @RequestParam(required = false) String targetDate,
+            Model model) {
+        
+        LocalDate date = targetDate != null && !targetDate.isEmpty() 
+            ? LocalDate.parse(targetDate) 
+            : LocalDate.now();
+        
+        model.addAttribute("departments", departmentService.findAll());
+        model.addAttribute("targetDate", date);
+        
+        // Calculate due trainings for all departments
+        Map<Long, List<Employee>> departmentEmployees = new HashMap<>();
+        Map<Long, Map<Long, Map<Training, LocalDate>>> allDueTrainings = new HashMap<>();
+        
+        for (var department : departmentService.findAll()) {
+            List<Employee> employees = employeeService.findByDepartmentId(department.getId());
+            departmentEmployees.put(department.getId(), employees);
+            
+            Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+            for (Employee employee : employees) {
+                Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
+                employeeDueTrainings.put(employee.getId(), dueTrainings);
+            }
+            allDueTrainings.put(department.getId(), employeeDueTrainings);
+        }
+        
+        model.addAttribute("departmentEmployees", departmentEmployees);
+        model.addAttribute("allDueTrainings", allDueTrainings);
+        
+        return "reports/print-all";
+    }
+    
+    @GetMapping("/training-needs/print-department")
+    public String printDepartment(
+            @RequestParam Long departmentId,
+            @RequestParam(required = false) String targetDate,
+            Model model) {
+        
+        LocalDate date = targetDate != null && !targetDate.isEmpty() 
+            ? LocalDate.parse(targetDate) 
+            : LocalDate.now();
+        
+        var department = departmentService.findById(departmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid department Id: " + departmentId));
+        List<Employee> employees = employeeService.findByDepartmentId(departmentId);
+        
+        // Calculate due trainings for each employee
+        Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+        for (Employee employee : employees) {
+            Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
+            employeeDueTrainings.put(employee.getId(), dueTrainings);
+        }
+        
+        model.addAttribute("department", department);
+        model.addAttribute("employees", employees);
+        model.addAttribute("employeeDueTrainings", employeeDueTrainings);
+        model.addAttribute("targetDate", date);
+        
+        return "reports/print-department";
+    }
 }
