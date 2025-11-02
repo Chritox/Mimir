@@ -10,6 +10,8 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"mandatoryTrainings", "attendedSessions"})
+@EqualsAndHashCode(exclude = {"mandatoryTrainings", "attendedSessions"})
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,7 @@ public class Employee {
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "training_id")
     )
-    private Set<Training> mandatoryTrainings;
+    private Set<Training> mandatoryTrainings = new HashSet<>();
 
     @ManyToMany(mappedBy = "participants")
     private Set<TrainingSession> attendedSessions = new HashSet<>();
