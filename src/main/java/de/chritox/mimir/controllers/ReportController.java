@@ -50,34 +50,54 @@ public class ReportController {
             
             // Calculate due trainings for each employee
             Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+            Map<Long, Map<Training, LocalDate>> employeeLastAttended = new HashMap<>();
             for (Employee employee : employees) {
                 Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
                 employeeDueTrainings.put(employee.getId(), dueTrainings);
+                
+                // Also get last attended dates
+                Map<Training, LocalDate> lastAttended = new HashMap<>();
+                for (Training training : dueTrainings.keySet()) {
+                    lastAttended.put(training, reportService.getLastAttendedDate(employee, training));
+                }
+                employeeLastAttended.put(employee.getId(), lastAttended);
             }
             
             model.addAttribute("employees", employees);
             model.addAttribute("employeeDueTrainings", employeeDueTrainings);
+            model.addAttribute("employeeLastAttended", employeeLastAttended);
             model.addAttribute("selectedDepartment", 
                 departmentService.findById(departmentId).orElse(null));
         } else {
             // Show all departments
             Map<Long, List<Employee>> departmentEmployees = new HashMap<>();
             Map<Long, Map<Long, Map<Training, LocalDate>>> allDueTrainings = new HashMap<>();
+            Map<Long, Map<Long, Map<Training, LocalDate>>> allLastAttended = new HashMap<>();
             
             for (var department : allDepartments) {
                 List<Employee> employees = employeeService.findByDepartmentId(department.getId());
                 departmentEmployees.put(department.getId(), employees);
                 
                 Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+                Map<Long, Map<Training, LocalDate>> employeeLastAttended = new HashMap<>();
                 for (Employee employee : employees) {
                     Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
                     employeeDueTrainings.put(employee.getId(), dueTrainings);
+                    
+                    // Also get last attended dates
+                    Map<Training, LocalDate> lastAttended = new HashMap<>();
+                    for (Training training : dueTrainings.keySet()) {
+                        lastAttended.put(training, reportService.getLastAttendedDate(employee, training));
+                    }
+                    employeeLastAttended.put(employee.getId(), lastAttended);
                 }
                 allDueTrainings.put(department.getId(), employeeDueTrainings);
+                allLastAttended.put(department.getId(), employeeLastAttended);
             }
             
             model.addAttribute("departmentEmployees", departmentEmployees);
             model.addAttribute("allDueTrainings", allDueTrainings);
+            model.addAttribute("allLastAttended", allLastAttended);
         }
         
         return "reports/training-needs";
@@ -118,21 +138,32 @@ public class ReportController {
         // Calculate due trainings for all departments
         Map<Long, List<Employee>> departmentEmployees = new HashMap<>();
         Map<Long, Map<Long, Map<Training, LocalDate>>> allDueTrainings = new HashMap<>();
+        Map<Long, Map<Long, Map<Training, LocalDate>>> allLastAttended = new HashMap<>();
         
         for (var department : departmentService.findAll()) {
             List<Employee> employees = employeeService.findByDepartmentId(department.getId());
             departmentEmployees.put(department.getId(), employees);
             
             Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+            Map<Long, Map<Training, LocalDate>> employeeLastAttended = new HashMap<>();
             for (Employee employee : employees) {
                 Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
                 employeeDueTrainings.put(employee.getId(), dueTrainings);
+                
+                // Also get last attended dates
+                Map<Training, LocalDate> lastAttended = new HashMap<>();
+                for (Training training : dueTrainings.keySet()) {
+                    lastAttended.put(training, reportService.getLastAttendedDate(employee, training));
+                }
+                employeeLastAttended.put(employee.getId(), lastAttended);
             }
             allDueTrainings.put(department.getId(), employeeDueTrainings);
+            allLastAttended.put(department.getId(), employeeLastAttended);
         }
         
         model.addAttribute("departmentEmployees", departmentEmployees);
         model.addAttribute("allDueTrainings", allDueTrainings);
+        model.addAttribute("allLastAttended", allLastAttended);
         
         return "reports/print-all";
     }
@@ -153,6 +184,7 @@ public class ReportController {
         
         // Calculate due trainings for each employee and count statistics
         Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+        Map<Long, Map<Training, LocalDate>> employeeLastAttended = new HashMap<>();
         int employeesWithNeeds = 0;
         int overdueCount = 0;
         
@@ -160,10 +192,18 @@ public class ReportController {
             Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
             employeeDueTrainings.put(employee.getId(), dueTrainings);
             
+            // Also get last attended dates
+            Map<Training, LocalDate> lastAttended = new HashMap<>();
+            for (Training training : dueTrainings.keySet()) {
+                lastAttended.put(training, reportService.getLastAttendedDate(employee, training));
+            }
+            employeeLastAttended.put(employee.getId(), lastAttended);
+            
             if (!dueTrainings.isEmpty()) {
                 employeesWithNeeds++;
                 for (LocalDate dueDate : dueTrainings.values()) {
-                    if (dueDate.isBefore(LocalDate.now())) {
+                    // null date means never attended = overdue
+                    if (dueDate == null || dueDate.isBefore(LocalDate.now())) {
                         overdueCount++;
                     }
                 }
@@ -173,6 +213,7 @@ public class ReportController {
         model.addAttribute("department", department);
         model.addAttribute("employees", employees);
         model.addAttribute("employeeDueTrainings", employeeDueTrainings);
+        model.addAttribute("employeeLastAttended", employeeLastAttended);
         model.addAttribute("targetDate", date);
         model.addAttribute("employeesWithNeeds", employeesWithNeeds);
         model.addAttribute("overdueCount", overdueCount);
@@ -222,9 +263,9 @@ public class ReportController {
         
         Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
         
-        // Count overdue trainings
+        // Count overdue trainings (null date means never attended = overdue)
         int overdueCount = (int) dueTrainings.values().stream()
-                .filter(dueDate -> dueDate.isBefore(LocalDate.now()))
+                .filter(dueDate -> dueDate == null || dueDate.isBefore(LocalDate.now()))
                 .count();
         
         model.addAttribute("employee", employee);

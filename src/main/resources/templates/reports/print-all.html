@@ -7,183 +7,161 @@
         @media print {
             .no-print { display: none; }
             .page-break { page-break-before: always; }
+            body { margin: 10mm; }
+            h1 { font-size: 18pt; }
+            h2 { font-size: 14pt; }
         }
         
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            font-size: 12pt;
+            font-size: 10pt;
+            color: #000;
         }
         
         h1 {
-            color: #333;
-            border-bottom: 3px solid #2c3e50;
-            padding-bottom: 10px;
-            font-size: 24pt;
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            font-size: 16pt;
+            margin-bottom: 15px;
         }
         
         h2 {
-            color: #2c3e50;
-            margin-top: 30px;
-            font-size: 18pt;
-        }
-        
-        .report-header {
-            margin-bottom: 30px;
+            color: #000;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 13pt;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3px;
         }
         
         .info-box {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-left: 4px solid #2c3e50;
-            margin-bottom: 20px;
+            border: 1px solid #000;
+            padding: 8px;
+            margin-bottom: 15px;
+            font-size: 9pt;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
-            border: 2px solid #2c3e50;
+            margin-bottom: 20px;
+            border: 1px solid #000;
+            font-size: 9pt;
         }
         
         th {
-            background-color: #2c3e50;
-            color: white;
-            padding: 12px;
+            background-color: #e0e0e0;
+            color: #000;
+            padding: 6px 4px;
             text-align: left;
             font-weight: bold;
-            border: 1px solid #1a252f;
+            border: 1px solid #000;
         }
         
         td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 4px;
+            border: 1px solid #000;
+            vertical-align: top;
         }
         
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .status-overdue {
-            background-color: #dc3545;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
+        .overdue-mark {
             font-weight: bold;
-            display: inline-block;
-        }
-        
-        .status-due {
-            background-color: #ffc107;
-            color: #333;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        
-        .status-current {
-            background-color: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            display: inline-block;
+            text-decoration: underline;
         }
         
         .no-print {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .btn {
-            padding: 10px 20px;
-            background-color: #007bff;
+            padding: 8px 15px;
+            background-color: #666;
             color: white;
-            border: none;
-            border-radius: 4px;
+            border: 1px solid #000;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
             margin-right: 10px;
+            font-size: 10pt;
         }
         
         .btn:hover {
-            background-color: #0056b3;
-        }
-        
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #545b62;
+            background-color: #333;
         }
     </style>
 </head>
 <body>
     <div class="no-print">
         <button class="btn" onclick="window.print()">🖨️ Drucken</button>
-        <a th:href="@{/reports/training-needs(targetDate=${targetDate})}" class="btn btn-secondary">← Zurück zur Übersicht</a>
+        <a th:href="@{/reports/training-needs(targetDate=${targetDate})}" class="btn">← Zurück</a>
     </div>
 
-    <div class="report-header">
-        <h1>Schulungsbedarfsanalyse - Alle Abteilungen</h1>
-        <div class="info-box">
-            <strong>Stichtag:</strong> <span th:text="${#temporals.format(targetDate, 'dd.MM.yyyy')}">01.01.2025</span><br>
-            <strong>Erstellt am:</strong> <span th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</span><br>
-            <strong>Anzahl Abteilungen:</strong> <span th:text="${departments.size()}">0</span>
-        </div>
+    <h1>Schulungsbedarfsanalyse - Alle Abteilungen</h1>
+    
+    <div class="info-box">
+        <strong>Stichtag:</strong> <span th:text="${#temporals.format(targetDate, 'dd.MM.yyyy')}">01.01.2025</span> | 
+        <strong>Erstellt:</strong> <span th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</span> | 
+        <strong>Abteilungen:</strong> <span th:text="${departments.size()}">0</span>
     </div>
 
     <div th:each="department, iterStat : ${departments}" th:class="${iterStat.index > 0 ? 'page-break' : ''}">
         <h2 th:text="${department.name}">Abteilung</h2>
         <p th:if="${department.description != null and !department.description.isEmpty()}" 
-           th:text="${department.description}">Beschreibung</p>
+           th:text="${department.description}" style="font-size: 9pt; font-style: italic; margin: 5px 0;">Beschreibung</p>
         
         <table>
             <thead>
                 <tr>
-                    <th>Mitarbeiter</th>
-                    <th>Fällige Schulungen</th>
-                    <th>Anzahl</th>
-                    <th>Status</th>
+                    <th style="width: 20%;">Mitarbeiter</th>
+                    <th style="width: 55%;">Fällige Schulungen (Letzte Teilnahme)</th>
+                    <th style="width: 10%;">Anzahl</th>
+                    <th style="width: 15%;">Status</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${departmentEmployees.get(department.id).isEmpty()}">
-                    <td colspan="4" style="text-align: center; color: #666;">Keine Mitarbeiter in dieser Abteilung</td>
+                    <td colspan="4" style="text-align: center;">Keine Mitarbeiter</td>
                 </tr>
                 <tr th:each="employee : ${departmentEmployees.get(department.id)}">
                     <td th:text="${employee.name}">Mitarbeiter</td>
                     <td>
                         <div th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
-                            <div th:each="entry : ${allDueTrainings.get(department.id).get(employee.id)}" style="margin-bottom: 5px;">
+                            <div th:each="entry : ${allDueTrainings.get(department.id).get(employee.id)}" style="margin-bottom: 3px;">
                                 <strong th:text="${entry.key.title}">Schulung</strong>
-                                <span style="color: #666; font-size: 0.9em;" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
-                                    (fällig: 01.01.2025)
+                                <span th:if="${allLastAttended.get(department.id).get(employee.id).get(entry.key) != null}">
+                                    (letzte: <span th:text="${#temporals.format(allLastAttended.get(department.id).get(employee.id).get(entry.key), 'dd.MM.yy')}">01.01.25</span>)
                                 </span>
-                                <span th:if="${entry.value.isBefore(#temporals.createToday())}" class="status-overdue" style="margin-left: 5px; font-size: 0.8em;">Überfällig</span>
-                                <span th:unless="${entry.value.isBefore(#temporals.createToday())}" class="status-due" style="margin-left: 5px; font-size: 0.8em;">Fällig</span>
+                                <span th:if="${allLastAttended.get(department.id).get(employee.id).get(entry.key) == null}" class="overdue-mark">
+                                    (ÜBERFÄLLIG)
+                                </span>
                             </div>
                         </div>
-                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}" style="color: #666;">
-                            Keine fälligen Schulungen
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
+                            -
                         </span>
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null}" 
-                              th:text="${allDueTrainings.get(department.id).get(employee.id).size()} + ' Schulung(en)'">0 Schulung(en)</span>
-                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null}">0 Schulung(en)</span>
+                              th:text="${allDueTrainings.get(department.id).get(employee.id).size()}">0</span>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null}">0</span>
                     </td>
-                    <td>
-                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}" 
-                              class="status-due">Schulungsbedarf</span>
-                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}" 
-                              class="status-current">Aktuell</span>
+                    <td style="text-align: center;">
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
+                            Bedarf
+                        </span>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
+                            Aktuell
+                        </span>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+    
+    <div style="margin-top: 15px; font-size: 8pt; border-top: 1px solid #000; padding-top: 8px;">
+        <strong>Legende:</strong> Fett unterstrichen = Überfällig (noch nie absolviert)
     </div>
 </body>
 </html>

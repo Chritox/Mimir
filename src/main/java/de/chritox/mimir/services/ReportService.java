@@ -33,8 +33,8 @@ public class ReportService {
             LocalDate lastAttended = getLastAttendedDate(employee, training);
             
             if (lastAttended == null) {
-                // Never attended - due immediately
-                dueTrainings.put(training, targetDate);
+                // Never attended - mark as null to display "Überfällig"
+                dueTrainings.put(training, null);
             } else if (training.getInterval() != null) {
                 // Calculate next due date
                 LocalDate nextDueDate = lastAttended.plusMonths(training.getInterval());
@@ -47,7 +47,7 @@ public class ReportService {
         return dueTrainings;
     }
     
-    private LocalDate getLastAttendedDate(Employee employee, Training training) {
+    public LocalDate getLastAttendedDate(Employee employee, Training training) {
         if (employee.getAttendedSessions() == null) {
             return null;
         }
@@ -118,7 +118,7 @@ public class ReportService {
         
         // Header row
         Row headerRow = sheet.createRow(rowNum++);
-        String[] headers = {"Mitarbeiter", "Schulung", "Letzte Teilnahme", "Fällig am", "Status"};
+        String[] headers = {"Mitarbeiter", "Schulung", "Letzte Teilnahme", "Fällig am / Status"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
@@ -140,17 +140,15 @@ public class ReportService {
                 trainingCell.setCellStyle(normalStyle);
                 
                 row.createCell(2).setCellStyle(normalStyle);
-                row.createCell(3).setCellStyle(normalStyle);
                 
-                Cell statusCell = row.createCell(4);
-                statusCell.setCellValue("Aktuell");
-                statusCell.setCellStyle(currentStyle);
+                Cell dueDateCell = row.createCell(3);
+                dueDateCell.setCellValue("Aktuell");
+                dueDateCell.setCellStyle(currentStyle);
             } else {
                 for (Map.Entry<Training, LocalDate> entry : dueTrainings.entrySet()) {
                     Training training = entry.getKey();
                     LocalDate dueDate = entry.getValue();
                     LocalDate lastAttended = getLastAttendedDate(employee, training);
-                    boolean isOverdue = dueDate.isBefore(LocalDate.now());
                     
                     Row row = sheet.createRow(rowNum++);
                     
@@ -172,12 +170,20 @@ public class ReportService {
                     }
                     
                     Cell dueDateCell = row.createCell(3);
-                    dueDateCell.setCellValue(dueDate);
-                    dueDateCell.setCellStyle(dateStyle);
-                    
-                    Cell statusCell = row.createCell(4);
-                    statusCell.setCellValue(isOverdue ? "Überfällig" : "Fällig");
-                    statusCell.setCellStyle(isOverdue ? overdueStyle : dueStyle);
+                    if (dueDate == null) {
+                        // Never attended - show as overdue
+                        dueDateCell.setCellValue("Überfällig");
+                        dueDateCell.setCellStyle(overdueStyle);
+                    } else {
+                        boolean isOverdue = dueDate.isBefore(LocalDate.now());
+                        if (isOverdue) {
+                            dueDateCell.setCellValue("Überfällig seit " + dueDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                            dueDateCell.setCellStyle(overdueStyle);
+                        } else {
+                            dueDateCell.setCellValue(dueDate);
+                            dueDateCell.setCellStyle(dateStyle);
+                        }
+                    }
                 }
             }
         }
@@ -186,8 +192,7 @@ public class ReportService {
         sheet.setColumnWidth(0, 6000);  // Name
         sheet.setColumnWidth(1, 8000);  // Training
         sheet.setColumnWidth(2, 4000);  // Last attended
-        sheet.setColumnWidth(3, 4000);  // Due date
-        sheet.setColumnWidth(4, 3500);  // Status
+        sheet.setColumnWidth(3, 5000);  // Due date/Status
         
         // Freeze panes (freeze header row)
         sheet.createFreezePane(0, 5);

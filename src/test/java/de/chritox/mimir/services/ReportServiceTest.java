@@ -73,7 +73,8 @@ class ReportServiceTest {
         
         assertEquals(1, dueTrainings.size());
         assertTrue(dueTrainings.containsKey(testTraining));
-        assertEquals(targetDate, dueTrainings.get(testTraining));
+        // Never attended trainings should have null date to indicate "Überfällig"
+        assertNull(dueTrainings.get(testTraining));
     }
 
     @Test
