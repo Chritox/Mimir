@@ -108,14 +108,19 @@
                                         <td th:text="${#strings.abbreviate(entry.key.description, 80)}">Beschreibung</td>
                                         <td th:text="${entry.key.interval != null ? entry.key.interval + ' Monate' : '-'}">-</td>
                                         <td>
-                                            <span th:text="${#temporals.format(entry.value, 'dd.MM.yyyy')}">01.01.2025</span>
+                                            <span th:if="${entry.value != null}" th:text="${#temporals.format(entry.value, 'dd.MM.yyyy')}">01.01.2025</span>
+                                            <span th:if="${entry.value == null}" class="text-danger">Noch nie</span>
                                         </td>
                                         <td>
-                                            <span th:if="${entry.value.isBefore(#temporals.createToday())}" 
+                                            <span th:if="${entry.value == null}" 
+                                                  class="badge bg-danger">
+                                                <i class="bi bi-exclamation-circle"></i> ÜBERFÄLLIG
+                                            </span>
+                                            <span th:if="${entry.value != null && entry.value.isBefore(#temporals.createToday())}" 
                                                   class="badge bg-danger">
                                                 <i class="bi bi-exclamation-circle"></i> Überfällig
                                             </span>
-                                            <span th:unless="${entry.value.isBefore(#temporals.createToday())}" 
+                                            <span th:if="${entry.value != null && !entry.value.isBefore(#temporals.createToday())}" 
                                                   class="badge bg-warning">
                                                 <i class="bi bi-clock"></i> Fällig
                                             </span>

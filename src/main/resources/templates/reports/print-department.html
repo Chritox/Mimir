@@ -6,105 +6,130 @@
     <style>
         @media print {
             .no-print { display: none; }
-            body { margin: 10mm; }
+            body { margin: 15mm; }
             h1 { font-size: 18pt; }
-            .summary-box { padding: 5px; }
-            .summary-number { font-size: 20pt; }
+            .summary-box { padding: 8px; }
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 20px;
-            font-size: 10pt;
-            color: #000;
+            font-size: 11pt;
+            color: #2c3e50;
+            line-height: 1.4;
         }
         
         h1 {
-            color: #000;
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
-            font-size: 16pt;
-            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 3px solid #34495e;
+            padding-bottom: 8px;
+            font-size: 20pt;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
         
         .info-box {
-            border: 1px solid #000;
-            padding: 8px;
-            margin-bottom: 15px;
-            font-size: 9pt;
+            border: 2px solid #7f8c8d;
+            background-color: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 10pt;
+            border-radius: 4px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            border: 1px solid #000;
-            font-size: 9pt;
+            margin-top: 15px;
+            border: 2px solid #34495e;
+            font-size: 10pt;
         }
         
         th {
-            background-color: #e0e0e0;
-            color: #000;
-            padding: 6px 4px;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            padding: 10px 8px;
             text-align: left;
-            font-weight: bold;
-            border: 1px solid #000;
+            font-weight: 600;
+            border: 1px solid #bdc3c7;
+            font-size: 10pt;
         }
         
         td {
-            padding: 4px;
-            border: 1px solid #000;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
             vertical-align: top;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
         
         .overdue-mark {
             font-weight: bold;
             text-decoration: underline;
+            color: #c0392b;
         }
         
         .no-print {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .btn {
-            padding: 8px 15px;
-            background-color: #666;
+            padding: 10px 20px;
+            background-color: #3498db;
             color: white;
-            border: 1px solid #000;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
             margin-right: 10px;
-            font-size: 10pt;
+            font-size: 11pt;
+            transition: background-color 0.3s;
         }
         
         .btn:hover {
-            background-color: #333;
+            background-color: #2980b9;
         }
         
         .summary {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            gap: 10px;
+            margin-bottom: 20px;
+            gap: 15px;
         }
         
         .summary-box {
             flex: 1;
-            border: 1px solid #000;
-            padding: 10px;
+            border: 2px solid #7f8c8d;
+            background-color: #f8f9fa;
+            padding: 15px;
             text-align: center;
+            border-radius: 4px;
         }
         
         .summary-number {
-            font-size: 24pt;
+            font-size: 28pt;
             font-weight: bold;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #2c3e50;
         }
         
         .summary-label {
-            font-size: 9pt;
+            font-size: 10pt;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .training-item {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .status-badge {
+            font-weight: 600;
         }
     </style>
 </head>
@@ -154,39 +179,41 @@
                 <td th:text="${employee.name}">Mitarbeiter</td>
                 <td>
                     <div th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}">
-                        <div th:each="entry : ${employeeDueTrainings.get(employee.id)}" style="margin-bottom: 3px;">
+                        <div th:each="entry : ${employeeDueTrainings.get(employee.id)}" class="training-item">
                             <strong th:text="${entry.key.title}">Schulung</strong>
-                            <span th:if="${employeeLastAttended.get(employee.id).get(entry.key) != null}">
+                            <span th:if="${employeeLastAttended.get(employee.id).get(entry.key) != null}" style="color: #7f8c8d;">
                                 (letzte: <span th:text="${#temporals.format(employeeLastAttended.get(employee.id).get(entry.key), 'dd.MM.yy')}">01.01.25</span>)
                             </span>
                             <span th:if="${employeeLastAttended.get(employee.id).get(entry.key) == null}" class="overdue-mark">
-                                (ÜBERFÄLLIG - noch nie absolviert)
+                                (ÜBERFÄLLIG - noch nie)
                             </span>
                         </div>
                     </div>
-                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}">
+                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" style="color: #95a5a6;">
                         -
                     </span>
                 </td>
-                <td style="text-align: center;">
+                <td style="text-align: center; font-weight: 600;">
                     <span th:if="${employeeDueTrainings.get(employee.id) != null}" 
                           th:text="${employeeDueTrainings.get(employee.id).size()}">0</span>
                     <span th:if="${employeeDueTrainings.get(employee.id) == null}">0</span>
                 </td>
                 <td style="text-align: center;">
-                    <span th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}">
-                        Bedarf
+                    <span th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}" 
+                          class="status-badge" style="color: #e67e22;">
+                        ⚠ Bedarf
                     </span>
-                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}">
-                        Aktuell
+                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" 
+                          class="status-badge" style="color: #27ae60;">
+                        ✓ Aktuell
                     </span>
                 </td>
             </tr>
         </tbody>
     </table>
     
-    <div style="margin-top: 15px; font-size: 8pt; border-top: 1px solid #000; padding-top: 8px;">
-        <strong>Legende:</strong> Fett unterstrichen = Überfällig (noch nie absolviert)
+    <div style="margin-top: 20px; font-size: 9pt; border-top: 2px solid #bdc3c7; padding-top: 12px; color: #7f8c8d;">
+        <strong style="color: #2c3e50;">Legende:</strong> <span class="overdue-mark">Fett unterstrichen</span> = Überfällig (noch nie absolviert) | ⚠ = Schulungsbedarf vorhanden | ✓ = Alle Schulungen aktuell
     </div>
 </body>
 </html>
