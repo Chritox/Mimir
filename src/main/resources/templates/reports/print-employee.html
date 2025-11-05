@@ -3,235 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="'Schulungsbericht - ' + ${employee.name}">Schulungsbericht</title>
-    <style>
-        @media print {
-            .no-print { display: none; }
-            body { margin: 15mm; }
-            h1 { font-size: 18pt; }
-            .summary-box { padding: 8px; }
-        }
-        
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 20px;
-            font-size: 11pt;
-            color: #2c3e50;
-            line-height: 1.4;
-        }
-        
-        h1 {
-            color: #2c3e50;
-            border-bottom: 3px solid #34495e;
-            padding-bottom: 8px;
-            font-size: 20pt;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        
-        h2 {
-            color: #2c3e50;
-            font-size: 16pt;
-            margin-top: 20px;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-        
-        .info-box {
-            border: 2px solid #7f8c8d;
-            background-color: #f8f9fa;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 10pt;
-            border-radius: 4px;
-        }
-        
-        .employee-info {
-            border: 2px solid #34495e;
-            background-color: #ecf0f1;
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            border: 2px solid #34495e;
-            font-size: 10pt;
-        }
-        
-        th {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-            padding: 10px 8px;
-            text-align: left;
-            font-weight: 600;
-            border: 1px solid #bdc3c7;
-        }
-        
-        td {
-            padding: 8px;
-            border: 1px solid #bdc3c7;
-            vertical-align: top;
-        }
-        
-        tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .overdue-mark {
-            font-weight: bold;
-            text-decoration: underline;
-            color: #c0392b;
-        }
-        
-        .no-print {
-            margin-bottom: 20px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-right: 10px;
-            font-size: 11pt;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .summary {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 15px;
-        }
-        
-        .summary-box {
-            flex: 1;
-            border: 2px solid #7f8c8d;
-            background-color: #f8f9fa;
-            padding: 15px;
-            text-align: center;
-            border-radius: 4px;
-        }
-        
-        .summary-number {
-            font-size: 28pt;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-        }
-        
-        .summary-label {
-            font-size: 10pt;
-            color: #7f8c8d;
-            font-weight: 500;
-        }
-        
-        .success-message {
-            text-align: center;
-            padding: 20px;
-            border: 2px solid #27ae60;
-            background-color: #d4edda;
-            margin: 20px 0;
-            border-radius: 4px;
-            color: #155724;
-        }
-        
-        .notes-box {
-            border: 2px solid #7f8c8d;
-            background-color: #f8f9fa;
-            padding: 12px;
-            margin-top: 20px;
-            font-size: 9pt;
-            border-radius: 4px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/print.css}">
 </head>
-<body>
+<body class="print-container">
     <div class="no-print">
-        <button class="btn" onclick="window.print()">🖨️ Drucken</button>
-        <a th:href="@{/reports/employee-training-report(employeeId=${employee.id},targetDate=${targetDate})}" 
-           class="btn">← Zurück</a>
+        <button class="print-btn" onclick="window.print()">🖨️ Drucken</button>
+        <a th:href="@{/reports/employee-training-report(employeeId=${employee.id},targetDate=${targetDate})}" class="print-btn print-btn-secondary">← Zurück</a>
     </div>
 
-    <h1>Schulungsbedarfsbericht</h1>
+    <h1 class="print-header" th:text="'Schulungsbericht - ' + ${employee.name}">Schulungsbericht</h1>
     
-    <div class="info-box">
-        <strong>Stichtag:</strong> <span th:text="${#temporals.format(targetDate, 'dd.MM.yyyy')}">01.01.2025</span> | 
-        <strong>Erstellt:</strong> <span th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</span>
+    <div class="print-info-box">
+        <p class="print-info-line"><strong>Mitarbeiter:</strong> <span th:text="${employee.name}">Max Mustermann</span></p>
+        <p class="print-info-line"><strong>Abteilung:</strong> <span th:text="${employee.department != null ? employee.department.name : 'Keine Abteilung'}">IT</span></p>
+        <p class="print-info-line"><strong>Stichtag:</strong> <span th:text="${#temporals.format(targetDate, 'dd.MM.yyyy')}">01.01.2025</span></p>
+        <p class="print-info-line"><strong>Erstellt:</strong> <span th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</span></p>
     </div>
 
-    <div class="employee-info">
-        <h2 style="margin-top: 0;" th:text="${employee.name}">Mitarbeiter</h2>
-        <strong>Abteilung:</strong> <span th:text="${employee.department != null ? employee.department.name : '-'}">-</span> | 
-        <strong>Pflichtschulungen:</strong> <span th:text="${employee.mandatoryTrainings != null ? employee.mandatoryTrainings.size() : 0}">0</span>
-    </div>
-
-    <div class="summary">
-        <div class="summary-box">
-            <span class="summary-number" th:text="${dueTrainings.size()}">0</span>
-            <div class="summary-label">Fällige Schulungen</div>
+    <div class="summary-container">
+        <div class="summary-box warning">
+            <h3>Fällige Schulungen</h3>
+            <p th:text="${dueTrainingsCount}">0</p>
         </div>
-        <div class="summary-box">
-            <span class="summary-number" th:text="${overdueCount}">0</span>
-            <div class="summary-label">Überfällig</div>
+        <div class="summary-box danger">
+            <h3>Überfällig</h3>
+            <p th:text="${overdueCount}">0</p>
         </div>
-        <div class="summary-box">
-            <span class="summary-number" th:text="${dueTrainings.size() == 0 ? '✓' : '-'}">-</span>
-            <div class="summary-label">Status</div>
+        <div class="summary-box" th:classappend="${dueTrainingsCount == 0 ? '' : 'warning'}">
+            <h3>Status</h3>
+            <p th:text="${dueTrainingsCount == 0 ? '✓' : '-'}">-</p>
         </div>
     </div>
 
-    <div th:if="${dueTrainings.isEmpty()}" class="success-message">
-        <h2 style="margin: 0;">✓ Keine fälligen Schulungen</h2>
-        <p style="margin: 5px 0;">Alle Pflichtschulungen sind aktuell.</p>
-    </div>
-
-    <div th:unless="${dueTrainings.isEmpty()}">
-        <h2>Fällige Schulungen</h2>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 25%;">Schulung</th>
-                    <th style="width: 40%;">Beschreibung</th>
-                    <th style="width: 15%;">Intervall</th>
-                    <th style="width: 20%;">Letzte Teilnahme / Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="entry : ${dueTrainings}">
-                    <td><strong th:text="${entry.key.title}">Schulung</strong></td>
-                    <td th:text="${#strings.abbreviate(entry.key.description, 80)}">Beschreibung</td>
-                    <td th:text="${entry.key.interval != null ? entry.key.interval + ' Monate' : '-'}">-</td>
-                    <td th:if="${entry.value == null}" class="overdue-mark">
-                        ÜBERFÄLLIG<br/>(noch nie absolviert)
-                    </td>
-                    <td th:unless="${entry.value == null}">
-                        <span th:text="${#temporals.format(entry.value, 'dd.MM.yyyy')}">01.01.2025</span>
-                        <span th:if="${entry.value.isBefore(#temporals.createToday())}" class="overdue-mark"><br/>(Überfällig)</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="notes-box">
-            <strong>Hinweise:</strong><br/>
-            • Fett unterstrichen = Überfällig<br/>
-            • "Noch nie absolviert" = Diese Schulung wurde bisher nicht durchgeführt<br/>
-            • Intervall = Wiederholungsfrequenz in Monaten
-        </div>
+    <h2>Pflichtschulungen</h2>
+    
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th>Schulung</th>
+                <th>Beschreibung</th>
+                <th>Intervall</th>
+                <th>Letzte Teilnahme</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${employee.mandatoryTrainings.isEmpty()}">
+                <td colspan="5" class="empty-state">Keine Pflichtschulungen zugewiesen</td>
+            </tr>
+            <tr th:each="training : ${employee.mandatoryTrainings}">
+                <td th:text="${training.title}">Schulung</td>
+                <td th:text="${training.description}">Beschreibung</td>
+                <td>
+                    <span th:if="${training.interval != null}" 
+                          th:text="${training.interval + ' Monate'}">12 Monate</span>
+                    <span th:if="${training.interval == null}">-</span>
+                </td>
+                <td>
+                    <span th:if="${lastAttendedDates.get(training) != null}" 
+                          th:text="${#temporals.format(lastAttendedDates.get(training), 'dd.MM.yyyy')}">01.01.2024</span>
+                    <span th:if="${lastAttendedDates.get(training) == null}" class="overdue-mark">
+                        Noch nie
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <span th:if="${lastAttendedDates.get(training) == null}" class="overdue-mark">
+                        ÜBERFÄLLIG
+                    </span>
+                    <span th:if="${lastAttendedDates.get(training) != null && lastAttendedDates.get(training).isBefore(#temporals.createToday())}" 
+                          class="status-needs">
+                        Überfällig
+                    </span>
+                    <span th:if="${lastAttendedDates.get(training) != null && !lastAttendedDates.get(training).isBefore(#temporals.createToday())}" 
+                          class="status-current">
+                        Aktuell
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="print-legend">
+        <h4>Legende:</h4>
+        <ul>
+            <li><span class="overdue-mark">ÜBERFÄLLIG</span> = Schulung wurde noch nie absolviert</li>
+            <li><span class="status-needs">Überfällig</span> = Schulung ist fällig (basierend auf letzter Teilnahme und Intervall)</li>
+            <li><span class="status-current">Aktuell</span> = Schulung ist aktuell (noch nicht fällig)</li>
+        </ul>
     </div>
 </body>
 </html>

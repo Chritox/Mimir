@@ -3,185 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="'Schulungsbedarf - ' + ${department.name}">Schulungsbedarf</title>
-    <style>
-        @media print {
-            .no-print { display: none; }
-            body { margin: 15mm; }
-            h1 { font-size: 18pt; }
-            .summary-box { padding: 8px; }
-        }
-        
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 20px;
-            font-size: 11pt;
-            color: #2c3e50;
-            line-height: 1.4;
-        }
-        
-        h1 {
-            color: #2c3e50;
-            border-bottom: 3px solid #34495e;
-            padding-bottom: 8px;
-            font-size: 20pt;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        
-        .info-box {
-            border: 2px solid #7f8c8d;
-            background-color: #f8f9fa;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 10pt;
-            border-radius: 4px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            border: 2px solid #34495e;
-            font-size: 10pt;
-        }
-        
-        th {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-            padding: 10px 8px;
-            text-align: left;
-            font-weight: 600;
-            border: 1px solid #bdc3c7;
-            font-size: 10pt;
-        }
-        
-        td {
-            padding: 8px;
-            border: 1px solid #bdc3c7;
-            vertical-align: top;
-        }
-        
-        tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .overdue-mark {
-            font-weight: bold;
-            text-decoration: underline;
-            color: #c0392b;
-        }
-        
-        .no-print {
-            margin-bottom: 20px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-right: 10px;
-            font-size: 11pt;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .summary {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 15px;
-        }
-        
-        .summary-box {
-            flex: 1;
-            border: 2px solid #7f8c8d;
-            background-color: #f8f9fa;
-            padding: 15px;
-            text-align: center;
-            border-radius: 4px;
-        }
-        
-        .summary-number {
-            font-size: 28pt;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-        }
-        
-        .summary-label {
-            font-size: 10pt;
-            color: #7f8c8d;
-            font-weight: 500;
-        }
-        
-        .training-item {
-            margin-bottom: 6px;
-            line-height: 1.5;
-        }
-        
-        .status-badge {
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/print.css}">
 </head>
-<body>
+<body class="print-container">
     <div class="no-print">
-        <button class="btn" onclick="window.print()">🖨️ Drucken</button>
-        <a th:href="@{/reports/training-needs(departmentId=${department.id},targetDate=${targetDate})}" class="btn">← Zurück</a>
+        <button class="print-btn" onclick="window.print()">🖨️ Drucken</button>
+        <a th:href="@{/reports/training-needs(departmentId=${department.id},targetDate=${targetDate})}" class="print-btn print-btn-secondary">← Zurück</a>
     </div>
 
-    <h1 th:text="'Schulungsbedarfsanalyse - ' + ${department.name}">Schulungsbedarf</h1>
+    <h1 class="print-header" th:text="'Schulungsbedarfsanalyse - ' + ${department.name}">Schulungsbedarf</h1>
     
-    <div class="info-box">
-        <strong>Stichtag:</strong> <span th:text="${#temporals.format(targetDate, 'dd.MM.yyyy')}">01.01.2025</span> | 
-        <strong>Erstellt:</strong> <span th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</span> | 
-        <strong>Mitarbeiter:</strong> <span th:text="${employees.size()}">0</span>
+    <div class="print-info-box">
+        <p class="print-info-line"><strong>Stichtag:</strong> <span th:text="${#temporals.format(targetDate, 'dd.MM.yyyy')}">01.01.2025</span></p>
+        <p class="print-info-line"><strong>Erstellt:</strong> <span th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}">01.01.2025 12:00</span></p>
+        <p class="print-info-line"><strong>Mitarbeiter:</strong> <span th:text="${employees.size()}">0</span></p>
     </div>
 
-    <div class="summary">
+    <div class="summary-container">
         <div class="summary-box">
-            <span class="summary-number" th:text="${employees.size()}">0</span>
-            <div class="summary-label">Gesamt</div>
+            <h3>Gesamt</h3>
+            <p th:text="${employees.size()}">0</p>
         </div>
-        <div class="summary-box">
-            <span class="summary-number" th:text="${employeesWithNeeds}">0</span>
-            <div class="summary-label">Mit Bedarf</div>
+        <div class="summary-box warning">
+            <h3>Mit Bedarf</h3>
+            <p th:text="${employeesWithNeeds}">0</p>
         </div>
-        <div class="summary-box">
-            <span class="summary-number" th:text="${overdueCount}">0</span>
-            <div class="summary-label">Überfällig</div>
+        <div class="summary-box danger">
+            <h3>Überfällig</h3>
+            <p th:text="${overdueCount}">0</p>
         </div>
     </div>
 
-    <table>
+    <table class="print-table">
         <thead>
             <tr>
-                <th style="width: 20%;">Mitarbeiter</th>
-                <th style="width: 50%;">Fällige Schulungen (Letzte Teilnahme)</th>
-                <th style="width: 10%;">Anzahl</th>
-                <th style="width: 20%;">Status</th>
+                <th>Mitarbeiter</th>
+                <th>Fällige Schulungen (Letzte Teilnahme)</th>
+                <th>Anzahl</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
             <tr th:if="${employees.isEmpty()}">
-                <td colspan="4" style="text-align: center;">Keine Mitarbeiter in dieser Abteilung</td>
+                <td colspan="4" class="empty-state">Keine Mitarbeiter in dieser Abteilung</td>
             </tr>
             <tr th:each="employee : ${employees}">
                 <td th:text="${employee.name}">Mitarbeiter</td>
                 <td>
                     <div th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}">
                         <div th:each="entry : ${employeeDueTrainings.get(employee.id)}" class="training-item">
-                            <strong th:text="${entry.key.title}">Schulung</strong>
-                            <span th:if="${employeeLastAttended.get(employee.id).get(entry.key) != null}" style="color: #7f8c8d;">
+                            <span class="training-name" th:text="${entry.key.title}">Schulung</span>
+                            <span th:if="${employeeLastAttended.get(employee.id).get(entry.key) != null}" class="training-date">
                                 (letzte: <span th:text="${#temporals.format(employeeLastAttended.get(employee.id).get(entry.key), 'dd.MM.yy')}">01.01.25</span>)
                             </span>
                             <span th:if="${employeeLastAttended.get(employee.id).get(entry.key) == null}" class="overdue-mark">
@@ -189,7 +61,7 @@
                             </span>
                         </div>
                     </div>
-                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" style="color: #95a5a6;">
+                    <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" class="empty-state">
                         -
                     </span>
                 </td>
@@ -200,20 +72,25 @@
                 </td>
                 <td style="text-align: center;">
                     <span th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}" 
-                          class="status-badge" style="color: #e67e22;">
-                        ⚠ Bedarf
+                          class="status-needs">
+                        <span class="status-icon">⚠</span>Bedarf
                     </span>
                     <span th:if="${employeeDueTrainings.get(employee.id) == null or employeeDueTrainings.get(employee.id).isEmpty()}" 
-                          class="status-badge" style="color: #27ae60;">
-                        ✓ Aktuell
+                          class="status-current">
+                        <span class="status-icon">✓</span>Aktuell
                     </span>
                 </td>
             </tr>
         </tbody>
     </table>
     
-    <div style="margin-top: 20px; font-size: 9pt; border-top: 2px solid #bdc3c7; padding-top: 12px; color: #7f8c8d;">
-        <strong style="color: #2c3e50;">Legende:</strong> <span class="overdue-mark">Fett unterstrichen</span> = Überfällig (noch nie absolviert) | ⚠ = Schulungsbedarf vorhanden | ✓ = Alle Schulungen aktuell
+    <div class="print-legend">
+        <h4>Legende:</h4>
+        <ul>
+            <li><span class="overdue-mark">Fett unterstrichen</span> = Überfällig (noch nie absolviert)</li>
+            <li><span class="status-icon">⚠</span> = Schulungsbedarf vorhanden</li>
+            <li><span class="status-icon">✓</span> = Alle Schulungen aktuell</li>
+        </ul>
     </div>
 </body>
 </html>
