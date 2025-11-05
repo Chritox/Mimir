@@ -64,6 +64,7 @@
                 </a>
             </div>
 
+            <!-- Single department view -->
             <div th:if="${employees != null}">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -77,13 +78,13 @@
                         </div>
                         
                         <div th:if="${!employees.isEmpty()}" class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
+                            <table class="table table-hover table-bordered">
+                                <thead class="table-dark">
                                     <tr>
                                         <th>Mitarbeiter</th>
                                         <th>Abteilung</th>
                                         <th>Fällige Schulungen</th>
-                                        <th>Details</th>
+                                        <th>Anzahl</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -111,6 +112,7 @@
                                                   th:text="${employeeDueTrainings.get(employee.id).size()} + ' Schulung(en)'">
                                                 0 Schulungen
                                             </span>
+                                            <span th:if="${employeeDueTrainings.get(employee.id) == null}">0 Schulung(en)</span>
                                         </td>
                                         <td>
                                             <span th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}" 
@@ -130,9 +132,78 @@
                 </div>
             </div>
 
-            <div th:unless="${selectedDepartmentId != null}" class="text-center text-muted py-5">
-                <i class="bi bi-filter display-1"></i>
-                <p class="mt-3">Bitte wählen Sie eine Abteilung aus, um den Schulungsbedarf anzuzeigen</p>
+            <!-- All departments view -->
+            <div th:if="${departmentEmployees != null}">
+                <div th:each="department : ${departments}" class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-building"></i> <span th:text="${department.name}">Abteilung</span>
+                        </h5>
+                        <div>
+                            <span class="badge bg-primary me-2" th:text="${departmentEmployees.get(department.id).size()} + ' Mitarbeiter'">0 Mitarbeiter</span>
+                            <a th:href="@{/reports/training-needs/print-department(departmentId=${department.id},targetDate=${targetDate})}" 
+                               class="btn btn-sm btn-primary" target="_blank">
+                                <i class="bi bi-printer"></i> Drucken
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${departmentEmployees.get(department.id).isEmpty()}" class="text-center text-muted py-3">
+                            <i class="bi bi-inbox"></i>
+                            <p class="mt-2 mb-0">Keine Mitarbeiter in dieser Abteilung</p>
+                        </div>
+                        
+                        <div th:if="${!departmentEmployees.get(department.id).isEmpty()}" class="table-responsive">
+                            <table class="table table-hover table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Mitarbeiter</th>
+                                        <th>Fällige Schulungen</th>
+                                        <th>Anzahl</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="employee : ${departmentEmployees.get(department.id)}">
+                                        <td>
+                                            <a th:href="@{/employees/{id}(id=${employee.id})}" th:text="${employee.name}">Mitarbeiter</a>
+                                        </td>
+                                        <td>
+                                            <div th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
+                                                <div th:each="entry : ${allDueTrainings.get(department.id).get(employee.id)}" class="mb-1">
+                                                    <strong th:text="${entry.key.title}">Schulung</strong>
+                                                    <span class="text-muted small" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
+                                                        (fällig: 01.01.2025)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}" class="text-muted">
+                                                Keine fälligen Schulungen
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null}" 
+                                                  th:text="${allDueTrainings.get(department.id).get(employee.id).size()} + ' Schulung(en)'">
+                                                0 Schulungen
+                                            </span>
+                                            <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null}">0 Schulung(en)</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}" 
+                                                  class="badge bg-warning">
+                                                <i class="bi bi-exclamation-triangle"></i> Schulungsbedarf
+                                            </span>
+                                            <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}" 
+                                                  class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Aktuell
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

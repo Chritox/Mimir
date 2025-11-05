@@ -43,6 +43,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+            border: 2px solid #2c3e50;
         }
         
         th {
@@ -51,11 +52,12 @@
             padding: 12px;
             text-align: left;
             font-weight: bold;
+            border: 1px solid #1a252f;
         }
         
         td {
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
         }
         
         tr:nth-child(even) {
@@ -142,42 +144,44 @@
             <thead>
                 <tr>
                     <th>Mitarbeiter</th>
-                    <th>Schulung</th>
-                    <th>Letzte Teilnahme</th>
-                    <th>Fällig am</th>
+                    <th>Fällige Schulungen</th>
+                    <th>Anzahl</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${departmentEmployees.get(department.id).isEmpty()}">
-                    <td colspan="5" style="text-align: center; color: #666;">Keine Mitarbeiter in dieser Abteilung</td>
+                    <td colspan="4" style="text-align: center; color: #666;">Keine Mitarbeiter in dieser Abteilung</td>
                 </tr>
-                <th:block th:each="employee : ${departmentEmployees.get(department.id)}">
-                    <th:block th:if="${allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
-                        <tr>
-                            <td th:text="${employee.name}">Mitarbeiter</td>
-                            <td colspan="3">Keine fälligen Schulungen</td>
-                            <td><span class="status-current">Aktuell</span></td>
-                        </tr>
-                    </th:block>
-                    <th:block th:if="${!allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
-                        <tr th:each="entry : ${allDueTrainings.get(department.id).get(employee.id)}">
-                            <td th:text="${employee.name}">Mitarbeiter</td>
-                            <td th:text="${entry.key.title}">Schulung</td>
-                            <td>
-                                <span th:if="${allDueTrainings.get(department.id).get(employee.id).get(entry.key) != null}">
-                                    <!-- Last attended logic would go here - simplified for now -->
-                                    -
+                <tr th:each="employee : ${departmentEmployees.get(department.id)}">
+                    <td th:text="${employee.name}">Mitarbeiter</td>
+                    <td>
+                        <div th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
+                            <div th:each="entry : ${allDueTrainings.get(department.id).get(employee.id)}" style="margin-bottom: 5px;">
+                                <strong th:text="${entry.key.title}">Schulung</strong>
+                                <span style="color: #666; font-size: 0.9em;" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
+                                    (fällig: 01.01.2025)
                                 </span>
-                            </td>
-                            <td th:text="${#temporals.format(entry.value, 'dd.MM.yyyy')}">01.01.2025</td>
-                            <td>
-                                <span th:if="${entry.value.isBefore(#temporals.createToday())}" class="status-overdue">Überfällig</span>
-                                <span th:unless="${entry.value.isBefore(#temporals.createToday())}" class="status-due">Fällig</span>
-                            </td>
-                        </tr>
-                    </th:block>
-                </th:block>
+                                <span th:if="${entry.value.isBefore(#temporals.createToday())}" class="status-overdue" style="margin-left: 5px; font-size: 0.8em;">Überfällig</span>
+                                <span th:unless="${entry.value.isBefore(#temporals.createToday())}" class="status-due" style="margin-left: 5px; font-size: 0.8em;">Fällig</span>
+                            </div>
+                        </div>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}" style="color: #666;">
+                            Keine fälligen Schulungen
+                        </span>
+                    </td>
+                    <td>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null}" 
+                              th:text="${allDueTrainings.get(department.id).get(employee.id).size()} + ' Schulung(en)'">0 Schulung(en)</span>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null}">0 Schulung(en)</span>
+                    </td>
+                    <td>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}" 
+                              class="status-due">Schulungsbedarf</span>
+                        <span th:if="${allDueTrainings.get(department.id).get(employee.id) == null or allDueTrainings.get(department.id).get(employee.id).isEmpty()}" 
+                              class="status-current">Aktuell</span>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

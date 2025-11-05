@@ -73,16 +73,20 @@ class ReportControllerTest {
     @Test
     void testTrainingNeeds_NoDepartmentSelected() throws Exception {
         when(departmentService.findAll()).thenReturn(List.of(testDepartment));
+        when(employeeService.findByDepartmentId(1L)).thenReturn(List.of(testEmployee));
+        when(reportService.getDueTrainingsForEmployee(any(), any())).thenReturn(new HashMap<>());
 
         mockMvc.perform(get("/reports/training-needs"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reports/training-needs"))
                 .andExpect(model().attributeExists("departments"))
                 .andExpect(model().attributeExists("targetDate"))
+                .andExpect(model().attributeExists("departmentEmployees"))
+                .andExpect(model().attributeExists("allDueTrainings"))
                 .andExpect(model().attribute("selectedDepartmentId", (Object) null));
 
         verify(departmentService, times(1)).findAll();
-        verify(employeeService, never()).findByDepartmentId(any());
+        verify(employeeService, times(1)).findByDepartmentId(1L);
     }
 
     @Test

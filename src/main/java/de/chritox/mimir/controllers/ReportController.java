@@ -39,11 +39,13 @@ public class ReportController {
             ? LocalDate.parse(targetDate) 
             : LocalDate.now();
         
-        model.addAttribute("departments", departmentService.findAll());
+        var allDepartments = departmentService.findAll();
+        model.addAttribute("departments", allDepartments);
         model.addAttribute("selectedDepartmentId", departmentId);
         model.addAttribute("targetDate", date);
         
         if (departmentId != null) {
+            // Single department view
             List<Employee> employees = employeeService.findByDepartmentId(departmentId);
             
             // Calculate due trainings for each employee
@@ -57,6 +59,25 @@ public class ReportController {
             model.addAttribute("employeeDueTrainings", employeeDueTrainings);
             model.addAttribute("selectedDepartment", 
                 departmentService.findById(departmentId).orElse(null));
+        } else {
+            // Show all departments
+            Map<Long, List<Employee>> departmentEmployees = new HashMap<>();
+            Map<Long, Map<Long, Map<Training, LocalDate>>> allDueTrainings = new HashMap<>();
+            
+            for (var department : allDepartments) {
+                List<Employee> employees = employeeService.findByDepartmentId(department.getId());
+                departmentEmployees.put(department.getId(), employees);
+                
+                Map<Long, Map<Training, LocalDate>> employeeDueTrainings = new HashMap<>();
+                for (Employee employee : employees) {
+                    Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
+                    employeeDueTrainings.put(employee.getId(), dueTrainings);
+                }
+                allDueTrainings.put(department.getId(), employeeDueTrainings);
+            }
+            
+            model.addAttribute("departmentEmployees", departmentEmployees);
+            model.addAttribute("allDueTrainings", allDueTrainings);
         }
         
         return "reports/training-needs";
@@ -157,5 +178,60 @@ public class ReportController {
         model.addAttribute("overdueCount", overdueCount);
         
         return "reports/print-department";
+    }
+    
+    @GetMapping("/employee-training-report")
+    public String employeeTrainingReport(
+            @RequestParam(required = false) Long employeeId,
+            @RequestParam(required = false) String targetDate,
+            Model model) {
+        
+        LocalDate date = targetDate != null && !targetDate.isEmpty() 
+            ? LocalDate.parse(targetDate) 
+            : LocalDate.now();
+        
+        model.addAttribute("employees", employeeService.findAll());
+        model.addAttribute("selectedEmployeeId", employeeId);
+        model.addAttribute("targetDate", date);
+        
+        if (employeeId != null) {
+            Employee employee = employeeService.findById(employeeId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid employee Id: " + employeeId));
+            
+            Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
+            
+            model.addAttribute("employee", employee);
+            model.addAttribute("dueTrainings", dueTrainings);
+        }
+        
+        return "reports/employee-training-report";
+    }
+    
+    @GetMapping("/employee-training-report/print")
+    public String printEmployeeReport(
+            @RequestParam Long employeeId,
+            @RequestParam(required = false) String targetDate,
+            Model model) {
+        
+        LocalDate date = targetDate != null && !targetDate.isEmpty() 
+            ? LocalDate.parse(targetDate) 
+            : LocalDate.now();
+        
+        Employee employee = employeeService.findById(employeeId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid employee Id: " + employeeId));
+        
+        Map<Training, LocalDate> dueTrainings = reportService.getDueTrainingsForEmployee(employee, date);
+        
+        // Count overdue trainings
+        int overdueCount = (int) dueTrainings.values().stream()
+                .filter(dueDate -> dueDate.isBefore(LocalDate.now()))
+                .count();
+        
+        model.addAttribute("employee", employee);
+        model.addAttribute("dueTrainings", dueTrainings);
+        model.addAttribute("targetDate", date);
+        model.addAttribute("overdueCount", overdueCount);
+        
+        return "reports/print-employee";
     }
 }
