@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build JAR with Maven
-        run: mvn clean package
+        run: ./mvnw clean package
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
@@ -40,8 +40,11 @@ jobs:
           java-version: '17'
           distribution: 'graalvm'
 
+      - name: Add Native-Image to PATH
+        run: gu install native-image
+
       - name: Build Native Executable
-        run: mvn -Pnative native:compile
+        run: ./mvnw -Pnative native:compile
 
       - name: Upload Native EXE
         uses: actions/upload-artifact@v4
