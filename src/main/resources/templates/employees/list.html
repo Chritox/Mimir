@@ -4,6 +4,9 @@
 <body>
     <nav th:replace="~{fragments/header :: navbar}"></nav>
 
+    <!-- Flash Messages -->
+    <div th:replace="~{fragments/header :: flash-messages}"></div>
+
     <div class="content">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -45,12 +48,15 @@
                                             <a th:href="@{/employees/edit/{id}(id=${employee.id})}" class="btn btn-warning" title="Bearbeiten">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a th:href="@{/employees/delete/{id}(id=${employee.id})}" 
-                                               class="btn btn-danger" 
-                                               title="Löschen"
-                                               onclick="return confirm('Möchten Sie diesen Mitarbeiter wirklich löschen?')">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+                                            <form th:action="@{/employees/{id}(id=${employee.id})}" method="post" style="display: inline;">
+                                                <input type="hidden" name="_method" value="DELETE"/>
+                                                <button type="submit" 
+                                                        class="btn btn-danger btn-sm" 
+                                                        title="Löschen"
+                                                        onclick="return confirm('Möchten Sie diesen Mitarbeiter wirklich löschen?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
