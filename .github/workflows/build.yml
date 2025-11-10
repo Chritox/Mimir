@@ -23,7 +23,7 @@ jobs:
         run: mvn clean package
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: springboot-jar
           path: target/*.jar
@@ -44,7 +44,7 @@ jobs:
         run: mvn -Pnative native:compile
 
       - name: Upload Native EXE
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: springboot-exe-win
           path: target/*.exe
