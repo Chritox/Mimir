@@ -95,7 +95,7 @@ class EmployeeControllerTest {
     void testCreateEmployee() throws Exception {
         when(employeeService.save(any(Employee.class))).thenReturn(testEmployee);
 
-        mockMvc.perform(post("/employees/save")
+        mockMvc.perform(post("/employees")
                         .param("name", "Max Mustermann")
                         .param("department.id", "1"))
                 .andExpect(status().is3xxRedirection())
@@ -134,12 +134,14 @@ class EmployeeControllerTest {
 
     @Test
     void testDeleteEmployee() throws Exception {
+        when(employeeService.findById(1L)).thenReturn(Optional.of(testEmployee));
         doNothing().when(employeeService).deleteById(1L);
 
-        mockMvc.perform(get("/employees/delete/1"))
+        mockMvc.perform(delete("/employees/1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/employees"));
 
+        verify(employeeService, times(1)).findById(1L);
         verify(employeeService, times(1)).deleteById(1L);
     }
 }
