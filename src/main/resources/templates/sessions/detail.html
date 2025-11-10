@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-calendar-event"></i> Termindetails</h1>
+                <div>
+                    <a th:href="@{/sessions/edit/{id}(id=${trainingSession.id})}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Bearbeiten
+                    </a>
+                    <a th:href="@{/sessions}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Zurück
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Termininformationen</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th style="width: 150px;">ID:</th>
+                                    <td th:text="${trainingSession.id}">1</td>
+                                </tr>
+                                <tr>
+                                    <th>Schulung:</th>
+                                    <td>
+                                        <span th:if="${trainingSession.training != null}">
+                                            <a th:href="@{/trainings/{id}(id=${trainingSession.training.id})}" 
+                                               th:text="${trainingSession.training.title}">Erste Hilfe</a>
+                                        </span>
+                                        <span th:unless="${trainingSession.training != null}" class="text-muted">N/A</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Datum:</th>
+                                    <td th:text="${#temporals.format(trainingSession.date, 'dd.MM.yyyy')}">01.01.2025</td>
+                                </tr>
+                                <tr>
+                                    <th>Teilnehmeranzahl:</th>
+                                    <td th:text="${trainingSession.participants != null ? trainingSession.participants.size() : 0}">0</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Teilnehmer</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush" th:if="${trainingSession.participants != null and !trainingSession.participants.isEmpty()}">
+                                <li class="list-group-item d-flex justify-content-between align-items-center" 
+                                    th:each="participant : ${trainingSession.participants}">
+                                    <div>
+                                        <a th:href="@{/employees/{id}(id=${participant.id})}" th:text="${participant.name}">Mitarbeiter</a>
+                                        <br>
+                                        <small class="text-muted" th:if="${participant.department != null}" 
+                                               th:text="${participant.department.name}">Abteilung</small>
+                                    </div>
+                                </li>
+                            </ul>
+                            <p class="text-muted mb-0" th:if="${trainingSession.participants == null or trainingSession.participants.isEmpty()}">
+                                Keine Teilnehmer angemeldet
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

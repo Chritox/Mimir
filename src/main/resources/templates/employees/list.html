@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-people"></i> Mitarbeiter</h1>
+                <a th:href="@{/employees/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Neuer Mitarbeiter
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Abteilung</th>
+                                    <th>Pflichtschulungen</th>
+                                    <th class="table-actions">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${employees.isEmpty()}">
+                                    <td colspan="5" class="text-center text-muted">
+                                        Keine Mitarbeiter vorhanden
+                                    </td>
+                                </tr>
+                                <tr th:each="employee : ${employees}">
+                                    <td th:text="${employee.id}">1</td>
+                                    <td th:text="${employee.name}">Max Mustermann</td>
+                                    <td th:text="${employee.department != null ? employee.department.name : '-'}">IT</td>
+                                    <td th:text="${employee.mandatoryTrainings != null ? employee.mandatoryTrainings.size() : 0}">0</td>
+                                    <td class="table-actions">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a th:href="@{/employees/{id}(id=${employee.id})}" class="btn btn-info" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a th:href="@{/employees/edit/{id}(id=${employee.id})}" class="btn btn-warning" title="Bearbeiten">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a th:href="@{/employees/delete/{id}(id=${employee.id})}" 
+                                               class="btn btn-danger" 
+                                               title="Löschen"
+                                               onclick="return confirm('Möchten Sie diesen Mitarbeiter wirklich löschen?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

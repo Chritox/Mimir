@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="jumbotron bg-light p-5 rounded">
+                <h1 class="display-4">
+                    <i class="bi bi-book"></i> Willkommen bei Mimir
+                </h1>
+                <p class="lead">Ihr Schulungsmanagementsystem für die Verwaltung von Mitarbeitern, Schulungen und Schulungsterminen.</p>
+                <hr class="my-4">
+                <p>Nutzen Sie das Navigationsmenü, um auf die verschiedenen Bereiche zuzugreifen.</p>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-people display-1 text-primary"></i>
+                            <h5 class="card-title mt-3">Mitarbeiter</h5>
+                            <p class="card-text">Verwalten Sie Ihre Mitarbeiter und deren Schulungen.</p>
+                            <a th:href="@{/employees}" class="btn btn-primary">
+                                <i class="bi bi-arrow-right"></i> Zur Übersicht
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-mortarboard display-1 text-success"></i>
+                            <h5 class="card-title mt-3">Schulungen</h5>
+                            <p class="card-text">Verwalten Sie alle verfügbaren Schulungen.</p>
+                            <a th:href="@{/trainings}" class="btn btn-success">
+                                <i class="bi bi-arrow-right"></i> Zur Übersicht
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-calendar-event display-1 text-warning"></i>
+                            <h5 class="card-title mt-3">Schulungstermine</h5>
+                            <p class="card-text">Verwalten Sie Schulungstermine und Teilnehmer.</p>
+                            <a th:href="@{/sessions}" class="btn btn-warning">
+                                <i class="bi bi-arrow-right"></i> Zur Übersicht
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-building display-1 text-info"></i>
+                            <h5 class="card-title mt-3">Abteilungen</h5>
+                            <p class="card-text">Verwalten Sie Abteilungen und deren Mitarbeiter.</p>
+                            <a th:href="@{/departments}" class="btn btn-info">
+                                <i class="bi bi-arrow-right"></i> Zur Übersicht
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

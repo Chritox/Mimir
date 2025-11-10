@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}"></head>
+<body>
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h1><i class="bi bi-person-badge"></i> Mitarbeiter Schulungsbericht</h1>
+                    <p class="lead mb-0">Übersicht über fällige Schulungen eines Mitarbeiters</p>
+                </div>
+                <div>
+                    <a th:if="${employee != null}" 
+                       th:href="@{/reports/employee-training-report/print(employeeId=${employee.id},targetDate=${targetDate})}" 
+                       class="btn btn-primary" target="_blank">
+                        <i class="bi bi-printer"></i> Druckansicht
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Filter</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/reports/employee-training-report}" method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="employeeId" class="form-label">Mitarbeiter</label>
+                            <select class="form-select" id="employeeId" name="employeeId" onchange="this.form.submit()">
+                                <option value="">-- Mitarbeiter auswählen --</option>
+                                <option th:each="emp : ${employees}" 
+                                        th:value="${emp.id}" 
+                                        th:text="${emp.name} + (${emp.department != null ? ' (' + emp.department.name + ')' : ''})"
+                                        th:selected="${emp.id == selectedEmployeeId}">Mitarbeiter</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="targetDate" class="form-label">Stichtag</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   id="targetDate" 
+                                   name="targetDate" 
+                                   th:value="${targetDate}"
+                                   onchange="this.form.submit()">
+                            <div class="form-text">Zeigt Schulungen, die bis zu diesem Datum fällig sind</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div th:if="${employee != null}">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-circle"></i> <span th:text="${employee.name}">Mitarbeiter</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Abteilung:</strong> 
+                                    <span th:text="${employee.department != null ? employee.department.name : '-'}">-</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Anzahl Pflichtschulungen:</strong> 
+                                    <span th:text="${employee.mandatoryTrainings != null ? employee.mandatoryTrainings.size() : 0}">0</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Fällige Schulungen</h5>
+                        <span class="badge" 
+                              th:classappend="${dueTrainings.size() > 0 ? 'bg-warning' : 'bg-success'}"
+                              th:text="${dueTrainings.size()} + ' Schulung(en)'">
+                            0 Schulungen
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${dueTrainings.isEmpty()}" class="text-center text-muted py-4">
+                            <i class="bi bi-check-circle display-1 text-success"></i>
+                            <p class="mt-3">Keine fälligen Schulungen!</p>
+                            <p class="text-muted">Dieser Mitarbeiter hat alle Pflichtschulungen absolviert.</p>
+                        </div>
+                        
+                        <div th:if="${!dueTrainings.isEmpty()}" class="table-responsive">
+                            <table class="table table-hover table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Schulung</th>
+                                        <th>Beschreibung</th>
+                                        <th>Intervall (Monate)</th>
+                                        <th>Fällig am</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="entry : ${dueTrainings}">
+                                        <td>
+                                            <strong th:text="${entry.key.title}">Schulung</strong>
+                                        </td>
+                                        <td th:text="${#strings.abbreviate(entry.key.description, 80)}">Beschreibung</td>
+                                        <td th:text="${entry.key.interval != null ? entry.key.interval + ' Monate' : '-'}">-</td>
+                                        <td>
+                                            <span th:text="${#temporals.format(entry.value, 'dd.MM.yyyy')}">01.01.2025</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${entry.value.isBefore(#temporals.createToday())}" 
+                                                  class="badge bg-danger">
+                                                <i class="bi bi-exclamation-circle"></i> Überfällig
+                                            </span>
+                                            <span th:unless="${entry.value.isBefore(#temporals.createToday())}" 
+                                                  class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> Fällig
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${!dueTrainings.isEmpty()}" class="mt-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Hinweise</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="mb-0">
+                                <li><strong class="text-danger">Überfällig:</strong> Diese Schulungen sind bereits fällig und sollten umgehend absolviert werden.</li>
+                                <li><strong class="text-warning">Fällig:</strong> Diese Schulungen müssen bis zum angegebenen Datum absolviert werden.</li>
+                                <li>Das Intervall gibt an, nach wie vielen Monaten die Schulung wiederholt werden muss.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:unless="${employee != null}" class="text-center text-muted py-5">
+                <i class="bi bi-person display-1"></i>
+                <p class="mt-3">Bitte wählen Sie einen Mitarbeiter aus, um den Schulungsbericht anzuzeigen</p>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
