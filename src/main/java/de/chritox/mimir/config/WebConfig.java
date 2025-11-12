@@ -5,10 +5,13 @@ import de.chritox.mimir.models.Training;
 import de.chritox.mimir.services.EmployeeService;
 import de.chritox.mimir.services.TrainingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.lang.NonNull;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -22,6 +25,16 @@ public class WebConfig implements WebMvcConfigurer {
     public void addFormatters(@NonNull FormatterRegistry registry) {
         registry.addConverter(new StringToTrainingConverter());
         registry.addConverter(new StringToEmployeeConverter());
+    }
+
+    /**
+     * Enable HTTP method override for PUT and DELETE requests via hidden _method parameter
+     */
+    @Bean
+    public FilterRegistrationBean<HiddenHttpMethodFilter> hiddenHttpMethodFilter() {
+        FilterRegistrationBean<HiddenHttpMethodFilter> filterRegistrationBean = new FilterRegistrationBean<>(new HiddenHttpMethodFilter());
+        filterRegistrationBean.setOrder(1);
+        return filterRegistrationBean;
     }
 
     private class StringToTrainingConverter implements Converter<String, Training> {

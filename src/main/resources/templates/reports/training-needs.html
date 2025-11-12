@@ -83,7 +83,7 @@
                                     <tr>
                                         <th>Mitarbeiter</th>
                                         <th>Abteilung</th>
-                                        <th>Fällige Schulungen</th>
+                                        <th>Fällige Schulungen (Letzte Teilnahme)</th>
                                         <th>Anzahl</th>
                                         <th>Status</th>
                                     </tr>
@@ -98,8 +98,12 @@
                                             <div th:if="${employeeDueTrainings.get(employee.id) != null and !employeeDueTrainings.get(employee.id).isEmpty()}">
                                                 <div th:each="entry : ${employeeDueTrainings.get(employee.id)}" class="mb-1">
                                                     <strong th:text="${entry.key.title}">Schulung</strong>
-                                                    <span class="text-muted small" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
-                                                        (fällig: 01.01.2025)
+                                                    <span class="text-muted small" th:if="${employeeLastAttended.get(employee.id).get(entry.key) != null}" 
+                                                          th:text="' (letzte: ' + ${#temporals.format(employeeLastAttended.get(employee.id).get(entry.key), 'dd.MM.yyyy')} + ')'">
+                                                        (letzte: 01.01.2025)
+                                                    </span>
+                                                    <span class="badge bg-danger" th:if="${employeeLastAttended.get(employee.id).get(entry.key) == null}">
+                                                        Überfällig
                                                     </span>
                                                 </div>
                                             </div>
@@ -158,7 +162,7 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th>Mitarbeiter</th>
-                                        <th>Fällige Schulungen</th>
+                                        <th>Fällige Schulungen (Letzte Teilnahme)</th>
                                         <th>Anzahl</th>
                                         <th>Status</th>
                                     </tr>
@@ -172,8 +176,12 @@
                                             <div th:if="${allDueTrainings.get(department.id).get(employee.id) != null and !allDueTrainings.get(department.id).get(employee.id).isEmpty()}">
                                                 <div th:each="entry : ${allDueTrainings.get(department.id).get(employee.id)}" class="mb-1">
                                                     <strong th:text="${entry.key.title}">Schulung</strong>
-                                                    <span class="text-muted small" th:text="' (fällig: ' + ${#temporals.format(entry.value, 'dd.MM.yyyy')} + ')'">
-                                                        (fällig: 01.01.2025)
+                                                    <span class="text-muted small" th:if="${allLastAttended.get(department.id).get(employee.id).get(entry.key) != null}" 
+                                                          th:text="' (letzte: ' + ${#temporals.format(allLastAttended.get(department.id).get(employee.id).get(entry.key), 'dd.MM.yyyy')} + ')'">
+                                                        (letzte: 01.01.2025)
+                                                    </span>
+                                                    <span class="badge bg-danger" th:if="${allLastAttended.get(department.id).get(employee.id).get(entry.key) == null}">
+                                                        Überfällig
                                                     </span>
                                                 </div>
                                             </div>

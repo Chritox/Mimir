@@ -98,7 +98,7 @@ class TrainingSessionControllerTest {
         when(employeeService.findById(1L)).thenReturn(Optional.of(testEmployee));
         when(sessionService.save(any(TrainingSession.class))).thenReturn(testSession);
 
-        mockMvc.perform(post("/sessions/save")
+        mockMvc.perform(post("/sessions")
                         .param("training", "1")
                         .param("date", LocalDate.now().plusDays(7).toString())
                         .param("participants", "1"))
@@ -138,12 +138,14 @@ class TrainingSessionControllerTest {
 
     @Test
     void testDeleteSession() throws Exception {
+        when(sessionService.findById(1L)).thenReturn(Optional.of(testSession));
         doNothing().when(sessionService).deleteById(1L);
 
-        mockMvc.perform(get("/sessions/delete/1"))
+        mockMvc.perform(delete("/sessions/1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/sessions"));
 
+        verify(sessionService, times(1)).findById(1L);
         verify(sessionService, times(1)).deleteById(1L);
     }
 
